@@ -18,7 +18,7 @@
         tools:layout="@layout/fragment_home"/>
 
     <fragment
-        android:name="com.nettest.anat.fragments.TestingFragment"
+        android:name="com.nettest.anat.fragments.testing_fragment.TestingFragment"
         android:label="Testing"
         android:id="@+id/navigation_testing"
         tools:layout="@layout/fragment_testing"/>
