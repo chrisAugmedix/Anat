@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Anat</string>
+    <string name="home_info"><b>Augmedix Network Assistance Tool</b>\n\nThis tool will assist in testing out the environment for both WIFI and LTE (Cellular)</string>
+    <string name="home_testing_info">Go to <b>Testing</b> when ready to test the network in the facility</string>
+    <string name="home_tools_info">Go to <b>Tools</b> to view additional network stats and access network tools</string>
+    <string name="testing_description">Test your area by clicking <b>Begin Test</b> and entering name</string>
+    <string name="testing_title">NETWORK TESTING</string>
+</resources>

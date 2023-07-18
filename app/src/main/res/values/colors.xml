@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!--    Midnight Blue-->
+    <color name="extra_dark_midnight_blue">#002865</color>
+    <color name="dark_midnight_blue">#175697</color>
+    <color name="midnight_blue">#3173B1</color>
+    <color name="light_midnight_blue">#A7BBD8</color>
+    <color name="extra_light_midnight_blue">#D3DDEC</color>
+
+    <!--    Morning Blue-->
+    <color name="morning_blue">#6DD5EC</color>
+    <color name="light_morning_blue">#BFE9F2</color>
+
+    <!--    Green-->
+    <color name="green">#00C593</color>
+    <color name="light_green">#00E4AA</color>
+    <color name="extra_light_green">#E4F9F0</color>
+
+    <!--    Neutral Colors-->
+    <color name="gray">#565656</color>
+    <color name="light_gray">#BDBDBD</color>
+    <color name="extra_light_gray">#F2F2F2</color>
+
+
+    <!--    RecyclerView Colors-->
+    <color name="babylightblue">#f3f8f8</color>
+
+    <color name="button_red">#FE0000</color>
+    <color name="button_green">#CCEEBC</color>
+</resources>
+

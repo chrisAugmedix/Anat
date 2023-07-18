@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Anat" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
+        <item name="colorPrimary">@color/midnight_blue</item>
+        <item name="colorPrimaryVariant">@color/light_morning_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/midnight_blue</item>
+        <item name="colorSecondaryVariant">@color/extra_dark_midnight_blue</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@android:color/white</item>
+        <!-- Customize your theme here. -->
+        <item name="android:textColor">@color/gray</item>
+<!--        <item name="android:textViewStyle">@style/customfontstyle</item>-->
+
+    </style>
+
+    <style name="Theme.Anat.ActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <dimen name="design_bottom_navigation_height" tools:override="true">60dp</dimen>
+
+    <style name="customfontstyle">
+        <item name="android:fontFamily" parent="android:Widget.TextView">@font/biryani</item>
+    </style>
+
+</resources>
+

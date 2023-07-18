@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:name="com.nettest.anat.fragments.DiagnosticsFragment"
+        android:label="Diagnostics"
+        android:id="@+id/navigation_diagnostics"
+        tools:layout="@layout/fragment_diagnostics"/>
+
+    <fragment
+        android:name="com.nettest.anat.fragments.HomeFragment"
+        android:label="Home"
+        android:id="@+id/navigation_home"
+        tools:layout="@layout/fragment_home"/>
+
+    <fragment
+        android:name="com.nettest.anat.fragments.TestingFragment"
+        android:label="Testing"
+        android:id="@+id/navigation_testing"
+        tools:layout="@layout/fragment_testing"/>
+
+    <fragment
+        android:name="com.nettest.anat.fragments.PortCheckerFragment"
+        android:label="Port Checker"
+        android:id="@+id/navigation_port_checker"
+        tools:layout="@layout/fragment_port_checker"/>
+
+    <fragment
+        android:name="com.nettest.anat.fragments.StatsViewerFragment"
+        android:label="View Stats"
+        android:id="@+id/navigation_stats_viewer"
+        tools:layout="@layout/fragment_stats_viewer"/>
+
+</navigation>

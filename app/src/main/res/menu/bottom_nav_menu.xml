@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_testing"
+        android:title="Testing"
+        android:icon="@drawable/testing_24"/>
+
+    <item
+        android:id="@+id/navigation_stats_viewer"
+        android:title="View Stats"
+        android:icon="@drawable/chart_svg"/>
+
+    <item
+        android:id="@+id/navigation_home"
+        android:title="Home"
+        android:icon="@drawable/home_24"/>
+
+    <item
+        android:id="@+id/navigation_port_checker"
+        android:title="Port Checker"
+        android:icon="@drawable/ethernet_svg"/>
+
+    <item
+        android:id="@+id/navigation_diagnostics"
+        android:title="Tools"
+        android:icon="@drawable/tools_svg"/>
+
+
+
+</menu>
