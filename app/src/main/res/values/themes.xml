@@ -13,6 +13,7 @@
         <item name="android:statusBarColor">@android:color/white</item>
         <!-- Customize your theme here. -->
         <item name="android:textColor">@color/gray</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
 <!--        <item name="android:textViewStyle">@style/customfontstyle</item>-->
 
     </style>
@@ -28,6 +29,15 @@
 
     <style name="customfontstyle">
         <item name="android:fontFamily" parent="android:Widget.TextView">@font/biryani</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme"
+        parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_bottom_dialog</item>
     </style>
 
 </resources>

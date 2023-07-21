@@ -50,17 +50,70 @@
         android:layout_marginTop="8dp"
         android:paddingBottom="16dp"
         android:paddingTop="16dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:visibility="invisible"
         android:textStyle="bold"
         android:hint="Session Name: TESTING"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/testingRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/startTestingButton"
         app:layout_constraintTop_toBottomOf="@id/testNameLabel"
         android:layout_marginBottom="40dp"/>
+
+    <LinearLayout
+        android:id="@+id/testingSessionTotalRoomsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/testingButtonContainer"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/testingTotalRoomsHardLbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Total Rooms: "/>
+
+        <TextView
+            android:id="@+id/testingTotalRooms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="0"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/testingSessionTimerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/testingSessionTotalRoomsContainer"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/testingTimeHardLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Testing Time: "/>
+
+        <TextView
+            android:id="@+id/mainTestingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="00m 00s"/>
+
+    </LinearLayout>
 
 
     <Button
@@ -74,29 +127,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="8dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/testingButtonContainer"
-        android:layout_marginBottom="10dp">
 
-        <TextView
-            android:id="@+id/testingTimeHardLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="Testing Time: "/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:text="00m 00s"/>
-
-    </LinearLayout>
 
 
 
@@ -109,6 +140,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
+            android:id="@+id/addRoomButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Room"
@@ -119,6 +151,7 @@
             android:layout_marginBottom="8dp"/>
 
         <Button
+            android:id="@+id/endTestingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="End Session"
