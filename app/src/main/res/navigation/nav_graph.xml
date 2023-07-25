@@ -24,13 +24,13 @@
         tools:layout="@layout/fragment_testing"/>
 
     <fragment
-        android:name="com.nettest.anat.fragments.PortCheckerFragment"
+        android:name="com.nettest.anat.fragments.pc_fragment.PortCheckerFragment"
         android:label="Port Checker"
         android:id="@+id/navigation_port_checker"
         tools:layout="@layout/fragment_port_checker"/>
 
     <fragment
-        android:name="com.nettest.anat.fragments.StatsViewerFragment"
+        android:name="com.nettest.anat.fragments.stats_fragment.StatsViewerFragment"
         android:label="View Stats"
         android:id="@+id/navigation_stats_viewer"
         tools:layout="@layout/fragment_stats_viewer"/>

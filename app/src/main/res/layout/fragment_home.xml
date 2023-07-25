@@ -13,7 +13,7 @@
     <ImageView
         android:id="@+id/companyLogo"
         android:layout_width="wrap_content"
-        android:layout_height="60sp"
+        android:layout_height="50sp"
         app:srcCompat="@drawable/augmedix_primary_logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,28 +36,38 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleInfo"
-        android:layout_marginTop="30dp"
-        android:textSize="25sp"
-        android:text="Device Serial: N/A"/>
+        android:layout_marginTop="15dp"
+        android:textSize="14sp"
+        android:text="Device Serial"/>
 
     <TextView
-        android:id="@+id/homeTestingInfo"
+        android:id="@+id/home_deviceSerialDynamic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/homeSerial"
+        android:text="Device Serial"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="30dp"
-        android:textSize="20sp"
-        android:text="@string/home_testing_info"/>
+        app:layout_constraintTop_toBottomOf="@id/homeSerial"/>
 
     <TextView
-        android:id="@+id/homeToolsInfo"
-        android:layout_width="match_parent"
+        android:id="@+id/home_connectedSSIDStatic"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/homeTestingInfo"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="30dp"
-        android:textSize="20sp"
-        android:text="@string/home_tools_info"/>
+        app:layout_constraintTop_toBottomOf="@id/home_deviceSerialDynamic"
+        android:layout_marginTop="14sp"
+        android:text="Connected SSID"/>
+
+    <TextView
+        android:id="@+id/home_connectedSsidDynamic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_connectedSSIDStatic"
+        android:textSize="24sp"
+        android:text="Tap to connect to wifi"/>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

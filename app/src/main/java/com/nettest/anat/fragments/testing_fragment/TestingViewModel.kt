@@ -10,11 +10,20 @@ class TestingViewModel: ViewModel() {
     private var totalRooms  = MutableLiveData<Int>(0)
     private var totalSecs   = MutableLiveData<Int>(0)
     private var junk        = MutableLiveData<Int>(0)
+    private var roomSeconds = MutableLiveData<Int>(0)
 
     //Public Functions
     fun setTime(min: Int, sec: Int) {
         minutes.value = minutes.value?.plus(min)
         seconds.value = seconds.value?.plus(sec)
+    }
+
+    fun roomAddSecond() {
+        roomSeconds.value = roomSeconds.value!! + 1
+    }
+
+    fun resetRoomSeconds() {
+        roomSeconds.value = 0
     }
 
     fun testingAddSecond() {
@@ -33,7 +42,7 @@ class TestingViewModel: ViewModel() {
         if (totalRooms.value!! >= 1) totalRooms.value = totalRooms.value!! - 1
     }
 
-    fun updateUI() {
+    fun forceUiChange() {
         if (junk.value != null) {
             junk.value = junk.value!! + 1
             if (junk.value!! > 100) {
@@ -50,6 +59,10 @@ class TestingViewModel: ViewModel() {
 
     fun updateUi(): MutableLiveData<Int> {
         return junk
+    }
+
+    fun getRoomSeconds(): MutableLiveData<Int> {
+        return roomSeconds
     }
 
 }

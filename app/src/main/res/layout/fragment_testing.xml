@@ -59,7 +59,7 @@
         android:id="@+id/testingRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/startTestingButton"
+        app:layout_constraintBottom_toTopOf="@id/testingSessionTimerContainer"
         app:layout_constraintTop_toBottomOf="@id/testNameLabel"
         android:layout_marginBottom="40dp"/>
 
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:text="Testing Time: "/>
+            android:text="Session Time: "/>
 
         <TextView
             android:id="@+id/mainTestingTime"
@@ -121,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Begin Test"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,7 +135,7 @@
         android:id="@+id/testingButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 

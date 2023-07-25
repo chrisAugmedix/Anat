@@ -47,27 +47,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/testingRoomSessionContainer"/>
 
-    <LinearLayout
-        android:id="@+id/sessionRoomNameContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/roomNameTitle">
-
-        <EditText
-            android:id="@+id/userSessionRoomNameEditText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/roomNameTitle"
-            android:hint="Enter Room Name or Number"
-            android:inputType="textCapSentences"
-            android:imeOptions="actionDone"
-            android:autofillHints="" />
-
-    </LinearLayout>
-
-
 
     <LinearLayout
         android:id="@+id/sessionTimerContainer"
@@ -75,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sessionRoomNameContainer">
+        app:layout_constraintTop_toBottomOf="@id/roomNameTitle">
 
         <TextView
 
@@ -95,13 +74,11 @@
 
     </LinearLayout>
 
-
-
     <Button
         android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Complete Room"
+        android:text="Exit Window"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sessionTimerContainer"
         android:layout_marginTop="100dp"/>

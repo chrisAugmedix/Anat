@@ -14,6 +14,20 @@ class MainActivity : AppCompatActivity() {
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment).navController
     }
 
+    private var androidPermissions = arrayOf(
+        android.Manifest.permission.READ_PHONE_STATE,
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        android.Manifest.permission.WAKE_LOCK,
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        android.Manifest.permission.MANAGE_EXTERNAL_STORAGE
+    )
+
+    override fun onStart() {
+        requestPermissions(androidPermissions, 101)
+        super.onStart()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)

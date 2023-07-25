@@ -19,9 +19,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nettest.anat.R
+import com.nettest.anat.RoomResult
+import com.nettest.anat.Utility
 import com.nettest.anat.databinding.FragmentTestingBinding
+import com.nettest.anat.global_roomList
 import com.nettest.anat.global_testEndTimeEpoch
 import com.nettest.anat.global_testName
 import com.nettest.anat.global_testStartTimeEpoch
@@ -33,6 +37,9 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private var _binding: FragmentTestingBinding? = null
     private val binding get() = _binding!!
 
+    private var roomSeconds: Int = 0
+
+    private var testingRoomState = false
 
     private var startDate: Long? = null
     private var endDate: Long? = null
@@ -42,6 +49,12 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private val handler = Handler()
     private val runnable = object: Runnable {
         override fun run() {
+
+            if (testingRoomState) {
+                model?.roomAddSecond()
+                roomSeconds++
+            }
+
             if (global_testingState) {
                 (model as TestingViewModel).testingAddSecond()
                 handler.postDelayed(this, 1000)
@@ -52,6 +65,17 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             }
 
         }
+
+    private val handlerRoom = Handler()
+    private val runnableRoom = object : Runnable {
+        override fun run() {
+            if (testingRoomState) {
+                model?.roomAddSecond()
+                handlerRoom.postDelayed(this, 1000)
+            } else { handlerRoom.removeCallbacks(this) }
+        }
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,25 +94,39 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val bottomDialog = getBottomDialog()
         val endTestingDialog = getEndAlert()
 
+        //RecyclerView
+        val recyclerView = binding.testingRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val adapter = TestingAdapter(global_roomList, requireContext())
+        recyclerView.adapter = adapter
+
         model = this.run { ViewModelProvider(this)[TestingViewModel::class.java] }
 
+        //Session Timer (minutes and seconds)
         model?.testFuncGetSec()?.observe(viewLifecycleOwner) {seconds ->
             val roomSessionNumber = bottomDialog.findViewById<TextView>(R.id.testingRoomSessionNumber)
             if (roomSessionNumber != null) roomSessionNumber.text = "$testTotalRooms"
-            val countTv = bottomDialog.findViewById<TextView>(R.id.roomSessionTimerLbl)
-            if (countTv != null) {
-
-            }
-            val time = getTimeFormat(seconds)
+            val time = Utility.getTimeFormat(seconds)
             binding.mainTestingTime.text = "${time.first}m ${time.second}s"
         }
 
+        //General Stats Update For List & Testing Dialog
         model?.updateUi()?.observe(viewLifecycleOwner) {_ ->
 
             val roomSessionNumber = bottomDialog.findViewById<TextView>(R.id.testingRoomSessionNumber)
             if (roomSessionNumber != null) roomSessionNumber.text = "$testTotalRooms"
             binding.testingTotalRooms.text = testTotalRooms.toString()
 
+            adapter.notifyDataSetChanged()
+
+        }
+
+        model?.getRoomSeconds()?.observe(viewLifecycleOwner){
+
+            Log.d("RoomTimer", "Running")
+            val roomSessionTimer = bottomDialog.findViewById<TextView>(R.id.roomSessionTimerLbl)
+            val time = Utility.getTimeFormat(it)
+            roomSessionTimer?.text = "${time.first}m ${time.second}s"
         }
 
         binding.testNameLabel.setOnLongClickListener {
@@ -109,46 +147,35 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         }
 
         binding.addRoomButton.setOnClickListener {
-            Log.d("TAG", "onViewCreated: $testTotalRooms")
+
+
             testTotalRooms+=1
-            model?.updateUI()
+            testingRoomState = true
+//            handlerRoom.postDelayed(runnableRoom, 1000)
+
+            model?.forceUiChange()
             bottomDialog.show()
         }
 
+
+
         //Reload
-        if (global_testingState) { startTesting() }
+        if (global_testingState) {
+            adapter.notifyDataSetChanged()
+            startTesting()
+        }
         else {
             if (global_testName != "") {
-                binding.testNameLabel.text = "Last Testing Session Name: $global_testName"
+                binding.testNameLabel.text = "Last Session Name: $global_testName"
                 binding.testNameLabel.visibility = View.VISIBLE
             }
         }
 
-//        val handler = Handler(Looper.getMainLooper())
-//        handler.postDelayed(object: Runnable {
-//            override fun run() {
-//                Log.d("Testing Activity", "Running Handler")
-//                (model as TestingViewModel).testFuncAddSec()
-//                handler.postDelayed(this, 1000)
-//                }
-//             }, 2000)
 
         super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun getTimeFormat(seconds: Int): Pair<Int, Int> {
 
-        val minutes = seconds / 60
-        val sec = seconds % 60
-        return Pair(minutes, sec)
-
-    }
-
-    private fun changeButtonLayout() {
-        //This function essentially starts the testing process
-        //record date & time
-        //
-    }
 
     @SuppressLint("SetTextI18n")
     private fun startTesting() {
@@ -156,7 +183,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         binding.startTestingButton.visibility = View.GONE
         binding.testingSessionTimerContainer.visibility = View.VISIBLE
         binding.testingButtonContainer.visibility = View.VISIBLE
-        binding.testNameLabel.text = "Test Name: $global_testName\n(tap and hold to edit)"
+        binding.testNameLabel.text = "Session Name: $global_testName\n(tap and hold to edit)"
         binding.testNameLabel.visibility = View.VISIBLE
         binding.testingSessionTotalRoomsContainer.visibility = View.VISIBLE
         if (!global_testingState) {
@@ -171,7 +198,8 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         binding.startTestingButton.visibility = View.VISIBLE
         binding.testingSessionTimerContainer.visibility = View.GONE
         binding.testingButtonContainer.visibility = View.GONE
-        binding.testNameLabel.text = "Last Testing Session Name: $global_testName"
+        binding.testingSessionTotalRoomsContainer.visibility = View.GONE
+        binding.testNameLabel.text = "Last Session Name: $global_testName"
         global_testingState = false
         handler.removeCallbacks(runnable)
 
@@ -187,6 +215,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val userRoomNameInput = view.findViewById<EditText>(R.id.userSessionRoomNameEditText)
         val roomNameTitle = view.findViewById<TextView>(R.id.roomNameTitle)
         val userInputContainer = view.findViewById<LinearLayout>(R.id.sessionRoomNameContainer)
+        var roomName = ""
 
         val fadeOut = AlphaAnimation(1f, 0f)
         fadeOut.interpolator = AccelerateInterpolator()
@@ -194,6 +223,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
         userRoomNameInput.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                roomName = v.text.toString()
                 roomNameTitle.text = "Room: ${v.text}"
                 val imm: InputMethodManager = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
@@ -208,11 +238,17 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         }
 
         buttonClose.setOnClickListener {
+            global_roomList.add(RoomInfo(R.drawable.alert_svg, roomName, roomState = RoomResult.ALERT, roomSeconds))
+            roomSeconds = 0
+            testingRoomState = false
+            model!!.forceUiChange()
+            model!!.resetRoomSeconds()
             dialog.dismiss()
             userInputContainer.visibility = View.VISIBLE
             roomNameTitle.text = "Room: "
             userRoomNameInput.text.clear()
         }
+
         dialog.setCancelable(false)
         dialog.setContentView(view)
 
