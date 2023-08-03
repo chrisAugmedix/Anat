@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="84dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+    <ImageView
+        android:id="@+id/companyLogo"
+        android:layout_width="125dp"
+        android:layout_height="72dp"
+        app:srcCompat="@drawable/augmedix_black_logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="Company Logo"
+        />
+
+    <Button
+        android:id="@+id/diagnostics_settingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Diagnostics Fragment"/>
+        android:text="Settings"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/gray"
+        style="?android:attr/borderlessButtonStyle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/diagnostics_fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/companyLogo"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

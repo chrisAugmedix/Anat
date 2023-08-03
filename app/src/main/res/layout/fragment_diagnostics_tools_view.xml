@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <TextView
+        android:id="@+id/diagnostic_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="App Tools"
+        android:textColor="?android:colorPrimary"
+         />
+
+    <LinearLayout
+        android:id="@+id/diagnostics_spinnerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/diagnostic_title">
+
+
+        <Spinner
+            android:popupBackground="@color/extra_light_gray"
+            android:backgroundTint="@color/Black"
+            android:gravity="center"
+            android:id="@+id/diagnostic_spinner"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/diagnostics_toolDescriptionStatic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Tool Description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/diagnostics_spinnerContainer"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/diagnostics_toolDescriptionDynamic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/diagnostics_toolDescriptionStatic"
+        android:text="placeholder text"/>
+
+    <EditText
+        android:id="@+id/diagnostics_userInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/diagnostics_toolDescriptionDynamic"
+        android:layout_marginTop="16dp"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:hint="Enter Address/Hostname"/>
+
+    <ScrollView
+        android:id="@+id/diagnostics_scrollViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/diagnostics_userInputEditText"
+        app:layout_constraintBottom_toTopOf="@id/diagnostics_toolsButton">
+
+        <TextView
+            android:id="@+id/diagnostics_textResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="placeholder text"/>
+
+    </ScrollView>
+
+    <com.kusu.loadingbutton.LoadingButton
+        android:id="@+id/diagnostics_toolsButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        app:lb_buttonColor="@color/light_midnight_blue"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:lb_isShadowEnable="false"
+        android:text="Run Check"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

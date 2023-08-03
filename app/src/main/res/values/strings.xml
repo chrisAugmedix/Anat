@@ -5,4 +5,15 @@
     <string name="home_tools_info">Go to <b>Tools</b> to view additional network stats and access network tools</string>
     <string name="testing_description">Test your area by clicking <b>Begin Test</b> and entering name</string>
     <string name="testing_title">NETWORK TESTING</string>
+    <string name="spinner_ping">Sends an ICMP packet to your destination address</string>
+    <string name="spinner_traceroute">Tracks real-time pathway from source to destination.\n<i>Note: Max of 64 hops</i></string>
+    <string name="spinner_speedTest">Run a speed test, downloads on average 10 megabytes of data to determine download and upload speeds.</string>
+
+    <string-array name="network_commands">
+        <item>Select command…</item>
+        <item>Ping</item>
+        <item>Traceroute</item>
+        <item>Speed Test</item>
+    </string-array>
+
 </resources>

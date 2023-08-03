@@ -6,7 +6,7 @@
     app:startDestination="@id/navigation_home">
 
     <fragment
-        android:name="com.nettest.anat.fragments.DiagnosticsFragment"
+        android:name="com.nettest.anat.fragments.tools_fragment.DiagnosticsFragment"
         android:label="Diagnostics"
         android:id="@+id/navigation_diagnostics"
         tools:layout="@layout/fragment_diagnostics"/>

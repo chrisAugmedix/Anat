@@ -67,6 +67,29 @@
         android:textSize="24sp"
         android:text="Tap to connect to wifi"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_connectedSsidDynamic">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:text="Server Connection State"/>
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/baseline_check_circle_24"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 
 
 

@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.nettest.anat.R
 import com.nettest.anat.databinding.FragmentPortCheckerBinding
-import com.nettest.anat.databinding.FragmentStatsChildLteBinding
 
 class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
 
     private var _binding: FragmentPortCheckerBinding? = null
     private val binding get() = _binding!!
+    private val resultList: MutableList<EndpointParent> = mutableListOf()
+    private var portCheckerViewModel: PortCheckerViewModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,7 +26,39 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+
+        val pep = EndpointParent("TestEndpointNameWithChild")
+        pep.endpoints.add(EndpointChild("ChildHostname1"))
+        pep.endpoints.add(EndpointChild("ChildHostname2"))
+        pep.endpoints.add(EndpointChild("ReallyLongEndpointForSomeReasonWecantshortenIt"))
+
+        resultList.add(EndpointParent("TestEndpointName1"))
+        resultList.add(EndpointParent("TestEndpointName2"))
+        resultList.add(EndpointParent("TestEndpointName3"))
+        resultList.add(pep)
+
+        val rv: RecyclerView = binding.pcRecyclerView
+        rv.layoutManager = LinearLayoutManager(requireContext())
+        val adapter = PortCheckerRecyclerViewAdapter(resultList, requireContext())
+        rv.adapter = adapter
+
+        portCheckerViewModel = this.run {ViewModelProvider(this)[PortCheckerViewModel::class.java]}
+        portCheckerViewModel?.getList()?.observe(viewLifecycleOwner) { results ->
+            adapter.notifyDataSetChanged()
+        }
+
+        binding.pcButtonRun.setOnClickListener {
+
+            binding.pcButtonRun.showLoading()
+
+        }
+
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun updateStats() {
+
     }
 
     override fun onResume() {

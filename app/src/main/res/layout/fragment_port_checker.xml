@@ -7,7 +7,7 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="16dp"
-    android:paddingBottom="72dp"
+    android:paddingBottom="84dp"
     tools:ignore="HardcodedText" >
 
     <ImageView
@@ -27,7 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/companyLogo"
         android:text="Augmedix Port Checking Tool"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="?colorPrimary"/>
 
     <LinearLayout
         android:id="@+id/pc_statsContainer"
@@ -102,20 +103,33 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pc_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pc_statsContainer"
-        app:layout_constraintBottom_toTopOf="@id/pc_runPc"
+        app:layout_constraintBottom_toTopOf="@id/pc_buttonRun"
         android:paddingTop="16dp"/>
 
-    <Button
-        android:id="@+id/pc_runPc"
-        android:layout_width="wrap_content"
+    <com.kusu.loadingbutton.LoadingButton
+        android:id="@+id/pc_buttonRun"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
+        app:lb_buttonColor="@color/light_midnight_blue"
+        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:lb_isShadowEnable="false"
         android:text="Run Check"/>
+
+<!--    <Button-->
+<!--        android:id="@+id/pc_runPc"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        android:text="Run Check"/>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
