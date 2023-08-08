@@ -52,6 +52,7 @@ dependencies {
 
     implementation 'com.github.koushikcse:LoadingButton:1.7'
     implementation 'fr.bmartel:jspeedtest:1.32.1'
+//    implementation 'com.github.AnyChart:AnyChart-Android:0.0.3'
 
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'

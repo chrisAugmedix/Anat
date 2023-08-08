@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -30,6 +31,16 @@ import com.nettest.anat.global_testEndTimeEpoch
 import com.nettest.anat.global_testName
 import com.nettest.anat.global_testStartTimeEpoch
 import com.nettest.anat.global_testingState
+import fr.bmartel.speedtest.SpeedTestReport
+import fr.bmartel.speedtest.SpeedTestSocket
+import fr.bmartel.speedtest.inter.ISpeedTestListener
+import fr.bmartel.speedtest.model.SpeedTestError
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 @SuppressLint("SetTextI18n")
 class TestingFragment: Fragment(R.layout.fragment_testing)  {
@@ -44,7 +55,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private var startDate: Long? = null
     private var endDate: Long? = null
     private var model: TestingViewModel? = null
-    private var testTotalRooms = 0
+    private val df = DecimalFormat("#,###.00")
 
     private val handler = Handler()
     private val runnable = object: Runnable {
@@ -56,26 +67,14 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             }
 
             if (global_testingState) {
-                (model as TestingViewModel).testingAddSecond()
+                (model as TestingViewModel).sessionAddSecond()
                 handler.postDelayed(this, 1000)
             } else {
-                (model as TestingViewModel).testingResetSeconds()
+                (model as TestingViewModel).resetSessionSeconds()
                 handler.removeCallbacks(this)
                 }
             }
-
         }
-
-    private val handlerRoom = Handler()
-    private val runnableRoom = object : Runnable {
-        override fun run() {
-            if (testingRoomState) {
-                model?.roomAddSecond()
-                handlerRoom.postDelayed(this, 1000)
-            } else { handlerRoom.removeCallbacks(this) }
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,15 +83,20 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        Log.d("TestingActivity", "Is Testing?: $global_testingState")
 
         //Initial
         val changeNameAlert = getStartAlert()
-        val bottomDialog = getBottomDialog()
+        val testRoomDialog = getRoomTestingDialog()
         val endTestingDialog = getEndAlert()
+
+        //Speed Test Object Initialized
+        val speedTestSocket: SpeedTestSocket = SpeedTestSocket()
+        speedTestSocket.socketTimeout = 5000
+
 
         //RecyclerView
         val recyclerView = binding.testingRecyclerView
@@ -103,30 +107,32 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         model = this.run { ViewModelProvider(this)[TestingViewModel::class.java] }
 
         //Session Timer (minutes and seconds)
-        model?.testFuncGetSec()?.observe(viewLifecycleOwner) {seconds ->
-            val roomSessionNumber = bottomDialog.findViewById<TextView>(R.id.testingRoomSessionNumber)
-            if (roomSessionNumber != null) roomSessionNumber.text = "$testTotalRooms"
+        model?.getSessionSeconds()?.observe(viewLifecycleOwner) { seconds ->
+            val roomSessionNumber = testRoomDialog.findViewById<TextView>(R.id.testingRoomSessionNumber)
+            if (roomSessionNumber != null) roomSessionNumber.text = "${global_roomList + 1}"
             val time = Utility.getTimeFormat(seconds)
             binding.mainTestingTime.text = "${time.first}m ${time.second}s"
         }
 
         //General Stats Update For List & Testing Dialog
         model?.updateUi()?.observe(viewLifecycleOwner) {_ ->
-
-            val roomSessionNumber = bottomDialog.findViewById<TextView>(R.id.testingRoomSessionNumber)
-            if (roomSessionNumber != null) roomSessionNumber.text = "$testTotalRooms"
-            binding.testingTotalRooms.text = testTotalRooms.toString()
-
             adapter.notifyDataSetChanged()
-
         }
 
         model?.getRoomSeconds()?.observe(viewLifecycleOwner){
 
-            Log.d("RoomTimer", "Running")
-            val roomSessionTimer = bottomDialog.findViewById<TextView>(R.id.roomSessionTimerLbl)
+            val roomSessionTimer = testRoomDialog.findViewById<TextView>(R.id.roomSessionTimerLbl)
             val time = Utility.getTimeFormat(it)
             roomSessionTimer?.text = "${time.first}m ${time.second}s"
+        }
+
+        model?.getDownloadProgress()?.observe(viewLifecycleOwner) {
+            val progressBar = testRoomDialog.findViewById<ProgressBar>(R.id.downloadProgressBar)
+            progressBar?.progress = it
+        }
+
+        model?.getRoomCount()?.observe(viewLifecycleOwner) {
+            binding.testingTotalRooms.text = it.toString()
         }
 
         binding.testNameLabel.setOnLongClickListener {
@@ -148,20 +154,42 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
         binding.addRoomButton.setOnClickListener {
 
-
-            testTotalRooms+=1
             testingRoomState = true
-//            handlerRoom.postDelayed(runnableRoom, 1000)
-
             model?.forceUiChange()
-            bottomDialog.show()
+            model?.addRoom()
+            testRoomDialog.show()
+            GlobalScope.launch(Dispatchers.IO) { speedTestSocket.startDownload("http://speedtest.tele2.net/10MB.zip") }
+
+
         }
 
+        speedTestSocket.addSpeedTestListener(object : ISpeedTestListener {
+            override fun onCompletion(report: SpeedTestReport?) {
+                val resultText = testRoomDialog.findViewById<TextView>(R.id.downloadSpeedDynamic)
+                val speedMb = df.format(report?.transferRateBit?.div(BigDecimal(1000000)))
+                requireActivity().runOnUiThread {
+                    model?.setProgressDownload(100)
+                    resultText?.text = "Result: $speedMb Mbps"
+                }
+            }
 
+            override fun onProgress(percent: Float, report: SpeedTestReport?) {
+                val progressText = testRoomDialog.findViewById<TextView>(R.id.downloadProgressText)
+                requireActivity().runOnUiThread {
+                    model?.setProgressDownload(percent.toInt())
+                    progressText?.text = "${percent.toInt()}/100"
+                }
+            }
 
-        //Reload
+            override fun onError(speedTestError: SpeedTestError?, errorMessage: String?) {
+                Log.d("SpeedTest", "onError: ERROR: $errorMessage")
+            }
+        })
+
+        //onReload
         if (global_testingState) {
             adapter.notifyDataSetChanged()
+            showTestingMedia()
             startTesting()
         }
         else {
@@ -171,22 +199,43 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             }
         }
 
-
         super.onViewCreated(view, savedInstanceState)
     }
 
 
-
-    @SuppressLint("SetTextI18n")
-    private fun startTesting() {
-
+    private fun showTestingMedia() {
         binding.startTestingButton.visibility = View.GONE
         binding.testingSessionTimerContainer.visibility = View.VISIBLE
         binding.testingButtonContainer.visibility = View.VISIBLE
         binding.testNameLabel.text = "Session Name: $global_testName\n(tap and hold to edit)"
         binding.testNameLabel.visibility = View.VISIBLE
         binding.testingSessionTotalRoomsContainer.visibility = View.VISIBLE
+    }
+
+    private fun hideTestingMedia() {
+
+        binding.testingSessionTimerContainer.visibility = View.GONE
+        binding.testingButtonContainer.visibility = View.GONE
+        binding.testingSessionTotalRoomsContainer.visibility = View.GONE
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun startTesting() {
+
+        showTestingMedia()
+        model?.resetSessionSeconds()
+
+        if (global_roomList.isNotEmpty()) {
+            model?.resetSessionSeconds()
+            Log.d("TestingFragmentSubmitStartTest", "getStartAlert: Running uichange\t${model==null}")
+            global_roomList.clear()
+            model?.resetRooms()
+            model?.updateUi()
+        }
+
         if (!global_testingState) {
+            Log.d("startTesting()", "startTesting: Running seconds Runnable")
             global_testingState = true
             handler.postDelayed(runnable, 1000)
         }
@@ -196,17 +245,16 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private fun endTesting() {
 
         binding.startTestingButton.visibility = View.VISIBLE
-        binding.testingSessionTimerContainer.visibility = View.GONE
-        binding.testingButtonContainer.visibility = View.GONE
-        binding.testingSessionTotalRoomsContainer.visibility = View.GONE
+        hideTestingMedia()
         binding.testNameLabel.text = "Last Session Name: $global_testName"
         global_testingState = false
         handler.removeCallbacks(runnable)
 
     }
 
+
     @SuppressLint("SetTextI18n")
-    private fun getBottomDialog(): BottomSheetDialog {
+    private fun getRoomTestingDialog(): BottomSheetDialog {
 
         val dialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.testing_bottom_sheet_testing_dialog, null)
@@ -225,6 +273,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 roomName = v.text.toString()
                 roomNameTitle.text = "Room: ${v.text}"
+                roomNameTitle.visibility = View.VISIBLE
                 val imm: InputMethodManager = v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v.windowToken, 0)
                 userInputContainer.startAnimation(fadeOut)
@@ -248,6 +297,8 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             roomNameTitle.text = "Room: "
             userRoomNameInput.text.clear()
         }
+
+
 
         dialog.setCancelable(false)
         dialog.setContentView(view)
@@ -278,16 +329,17 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private fun getEndAlert(): AlertDialog {
 
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("End Testing Session?")
-        builder.setPositiveButton("End Testing") {di, _ ->
+        builder.setTitle("End Session?")
+        builder.setPositiveButton("Confirm") {di, _ ->
             //End Testing Session
             val ed = System.currentTimeMillis()
             endDate = ed
             global_testEndTimeEpoch = ed
             endTesting()
+            model?.resetSessionSeconds()
             di.cancel()
         }
-        builder.setNegativeButton("Cancel/Continue Testing") { _, _ ->
+        builder.setNegativeButton("Cancel") { _, _ ->
             //Do Nothing
         }
 

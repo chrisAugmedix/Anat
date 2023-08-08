@@ -6,25 +6,16 @@
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
     android:layout_marginBottom="72dp"
+    android:layout_marginTop="8dp"
     tools:ignore="HardcodedText"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <ImageView
-        android:id="@+id/companyLogo"
-        android:layout_width="125dp"
-        android:layout_height="72dp"
-        app:srcCompat="@drawable/augmedix_black_logo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="Company Logo"
-        />
 
     <TextView
         android:id="@+id/titleLabel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/companyLogo"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="@string/testing_title"
         android:textColor="?colorPrimary"
         android:textSize="28sp"/>
@@ -67,7 +58,7 @@
         android:id="@+id/testingSessionTotalRoomsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/testingButtonContainer"
         android:layout_marginBottom="10dp">
@@ -77,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:text="Total Rooms: "/>
+            android:text="Total Rooms Tested: "/>
 
         <TextView
             android:id="@+id/testingTotalRooms"

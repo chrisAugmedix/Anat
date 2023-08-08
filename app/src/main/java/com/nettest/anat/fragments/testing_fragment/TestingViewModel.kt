@@ -1,22 +1,36 @@
 package com.nettest.anat.fragments.testing_fragment
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class TestingViewModel: ViewModel() {
 
-    private var minutes     = MutableLiveData<Int>(0)
-    private var seconds     = MutableLiveData<Int>(0)
-    private var totalRooms  = MutableLiveData<Int>(0)
-    private var totalSecs   = MutableLiveData<Int>(0)
-    private var junk        = MutableLiveData<Int>(0)
-    private var roomSeconds = MutableLiveData<Int>(0)
+    private var junk            = MutableLiveData<Int>(0)
+
+    private var totalRooms      = MutableLiveData<Int>(0)
+    private var roomSeconds     = MutableLiveData<Int>(0)
+    private var sessionSecs     = MutableLiveData<Int>(0)
+
+    private var roomSpeedTestDownload   = MutableLiveData<Float>(0F)
+    private var downloadProgress        = MutableLiveData<Int>(0)
+    private var roomSpeedTestUpload     = MutableLiveData<Float>(0F)
+    private var uploadProgress          = MutableLiveData<Int>(0)
+
+    //WIFI
+    private var currentRssi             = MutableLiveData<Int>(0)
+    private var currentConnectedApBssid = MutableLiveData<String>("N/A")
+    private var currentConnectedSsid    = MutableLiveData<String>("N/A")
+    private var avgRssi                 = MutableLiveData<Int>(0)
+
+    //LTE
+    private var currentRsrp = MutableLiveData<Int>(0)
+    private var currentRsrq = MutableLiveData<Int>(0)
+    private var currentBand = MutableLiveData<Int>(0)
+    private var avgRsrp     = MutableLiveData<Int>(0)
+    private var avgRsrq     = MutableLiveData<Int>(0)
 
     //Public Functions
-    fun setTime(min: Int, sec: Int) {
-        minutes.value = minutes.value?.plus(min)
-        seconds.value = seconds.value?.plus(sec)
-    }
 
     fun roomAddSecond() {
         roomSeconds.value = roomSeconds.value!! + 1
@@ -26,20 +40,22 @@ class TestingViewModel: ViewModel() {
         roomSeconds.value = 0
     }
 
-    fun testingAddSecond() {
-        totalSecs.value = totalSecs.value!! + 1
+    fun resetSessionSeconds() {
+        sessionSecs.value = 0
+        Log.d("startTesting() ", "Resetting Total Seconds\tSeconds: ${sessionSecs.value}")
     }
 
-    fun testingResetSeconds() {
-        totalSecs.value = 0
+    fun sessionAddSecond() {
+        sessionSecs.value = sessionSecs.value!! + 1
     }
 
-    fun addRooms() {
+
+    fun addRoom() {
         totalRooms.value = totalRooms.value!! + 1
     }
 
-    fun removeRooms() {
-        if (totalRooms.value!! >= 1) totalRooms.value = totalRooms.value!! - 1
+    fun resetRooms() {
+        totalRooms.value = 0
     }
 
     fun forceUiChange() {
@@ -51,10 +67,19 @@ class TestingViewModel: ViewModel() {
         }
     }
 
+    fun setRoomDownloadSpeed(speed: Float) { roomSpeedTestDownload.value = speed }
+
+    fun setRoomUploadSpeed(speed: Float) { roomSpeedTestUpload.value = speed }
+
+    fun setProgressDownload(progress: Int) {
+        downloadProgress.value = progress
+    }
+    fun setProgressUpload(progress: Int) {uploadProgress.value = progress}
+
 
     //Getters
-    fun testFuncGetSec(): MutableLiveData<Int> {
-        return totalSecs
+    fun getSessionSeconds(): MutableLiveData<Int> {
+        return sessionSecs
     }
 
     fun updateUi(): MutableLiveData<Int> {
@@ -64,5 +89,15 @@ class TestingViewModel: ViewModel() {
     fun getRoomSeconds(): MutableLiveData<Int> {
         return roomSeconds
     }
+
+    fun getRoomCount(): MutableLiveData<Int> {
+        return totalRooms
+    }
+
+    fun getSpeedTestDownload(): MutableLiveData<Float> { return roomSpeedTestDownload }
+    fun getSpeedTestUpload(): MutableLiveData<Float> { return roomSpeedTestUpload }
+
+    fun getDownloadProgress(): MutableLiveData<Int> { return downloadProgress }
+    fun getUploadProgress(): MutableLiveData<Int> { return uploadProgress }
 
 }

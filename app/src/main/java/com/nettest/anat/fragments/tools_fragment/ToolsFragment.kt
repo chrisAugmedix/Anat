@@ -59,8 +59,6 @@ class ToolsFragment: Fragment(R.layout.fragment_diagnostics_tools_view) {
             }
         }
 
-
-
         super.onViewCreated(view, savedInstanceState)
     }
 
