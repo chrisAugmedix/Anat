@@ -46,6 +46,8 @@
         android:textStyle="bold"
         android:hint="Session Name: TESTING"/>
 
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/testingRecyclerView"
         android:layout_width="match_parent"

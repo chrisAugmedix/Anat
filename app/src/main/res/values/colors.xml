@@ -34,5 +34,10 @@
 
     <color name="button_red">#FE0000</color>
     <color name="button_green">#AAC8A7</color>
+
+    <!-- Status Colors -->
+    <color name="status_good">#228b22</color>
+    <color name="status_alert">#f0e130</color>
+    <color name="status_failed">#FE0000</color>
 </resources>
 
