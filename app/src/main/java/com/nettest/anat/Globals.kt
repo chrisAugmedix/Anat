@@ -4,6 +4,7 @@ package com.nettest.anat
 import com.nettest.anat.fragments.pc_fragment.EndpointParent
 import com.nettest.anat.fragments.testing_fragment.RoomInfo
 import com.nettest.anat.fragments.testing_fragment.TestingCellModel
+import com.nettest.anat.fragments.testing_fragment.lteObject
 
 enum class RoomResult(val color: String) {
     GOOD("#228b22"),
@@ -32,6 +33,8 @@ var global_rsrqRoomList: MutableList<Int> = mutableListOf()
 
 var global_testingCellModel: TestingCellModel = TestingCellModel()
 var global_downloadResult: Float = 0F
+
+var global_cellTimeLine: MutableList<lteObject> = mutableListOf()
 
 
 //Testing Activity - App Settings

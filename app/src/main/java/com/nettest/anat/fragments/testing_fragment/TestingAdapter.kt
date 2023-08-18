@@ -30,7 +30,6 @@ class TestingAdapter(private val itemList: List<RoomInfo>, private val c: Contex
         Log.d("Result", item.toString())
         val lteImageView = holder.lteStatusView
         lteImageView.setImageResource(item.lteImage)
-        lteImageView.setColorFilter(Color.parseColor(item.lteImageColor))
         if (item.roomName.length > 10) { holder.roomName.textSize = 13F }
         else { holder.roomName.textSize = 18F }
         holder.roomName.text = item.roomName

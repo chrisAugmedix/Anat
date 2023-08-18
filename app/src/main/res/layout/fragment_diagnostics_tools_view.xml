@@ -57,7 +57,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/diagnostics_toolDescriptionStatic"
-        android:text="placeholder text"/>
+        android:text="Select a command..."/>
 
     <EditText
         android:id="@+id/diagnostics_userInputEditText"
@@ -75,7 +75,6 @@
         android:id="@+id/diagnostics_scrollViewContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="visible"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/diagnostics_userInputEditText"
@@ -85,7 +84,7 @@
             android:id="@+id/diagnostics_textResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="placeholder text"/>
+            android:text=""/>
 
     </ScrollView>
 

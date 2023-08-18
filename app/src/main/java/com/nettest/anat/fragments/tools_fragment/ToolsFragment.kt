@@ -35,6 +35,7 @@ class ToolsFragment: Fragment(R.layout.fragment_diagnostics_tools_view) {
                 parent: AdapterView<*>?, view: View?,
                 position: Int, id: Long
             ) {
+
                 Log.d("onItemSelected", "onItemSelected: $position")
                 when (position) {
 

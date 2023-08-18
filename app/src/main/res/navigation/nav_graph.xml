@@ -31,7 +31,7 @@
 
     <fragment
         android:name="com.nettest.anat.fragments.stats_fragment.StatsViewerFragment"
-        android:label="View Stats"
+        android:label="Stats"
         android:id="@+id/navigation_stats_viewer"
         tools:layout="@layout/fragment_stats_viewer"/>
 

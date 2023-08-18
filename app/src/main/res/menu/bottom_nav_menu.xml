@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/navigation_stats_viewer"
-        android:title="View Stats"
+        android:title="Stats"
         android:icon="@drawable/chart_svg"/>
 
     <item

@@ -1,5 +1,6 @@
 package com.nettest.anat.fragments.testing_fragment
 
+import android.util.Log
 import com.nettest.anat.R
 import com.nettest.anat.Utility
 
@@ -10,8 +11,7 @@ class TestingCellModel {
     private val connectedBandList: MutableList<Int> = mutableListOf()
 
     var grade: MetricGrade = MetricGrade.GOOD
-    var gradeColor: String = ""
-    var gradeImage: Int = 0
+    var gradeImage: Int = R.drawable.status_good
 
     fun addMetrics(rsrp: Int, rsrq: Int, band: Int) {
         rsrpValueList.add(rsrp)
@@ -31,52 +31,53 @@ class TestingCellModel {
             else -> { raiseGrade() }
         }
 
-        if ( (rsrpValueList.average() < -106 || rsrqValueList.average() < -8) && subBand ) reduceGrade()
+        if ( (rsrpValueList.average() <= -106 || rsrqValueList.average() <= -8) && subBand ) reduceGrade()
 
     }
 
     private fun reduceGrade(autoFail: Boolean = false) {
-        if (autoFail) {
 
+        Log.d("Result", "reduceGrade: ")
+        if (autoFail) {
             grade = MetricGrade.FAILED
-            gradeColor = "#228b22"
             gradeImage = R.drawable.status_failed
             return
         }
 
-        if (grade == MetricGrade.GOOD) {
-            MetricGrade.ALERT
-            gradeColor = "#f0e130"
-            gradeImage = R.drawable.status_alert
+        when(grade) {
+            MetricGrade.GOOD -> {
+                grade = MetricGrade.ALERT
+                gradeImage = R.drawable.status_alert
+            }
+            MetricGrade.ALERT -> {
+                grade = MetricGrade.FAILED
+                gradeImage = R.drawable.status_alert
+            }
+            MetricGrade.FAILED -> {}
         }
-        else {
-            MetricGrade.FAILED
-            gradeColor = "#FE0000"
-            gradeImage = R.drawable.status_failed
-        }
+
     }
 
     private fun raiseGrade() {
-        if (grade == MetricGrade.FAILED) {
-            grade = MetricGrade.ALERT
-            gradeColor = "#f0e130"
-            gradeImage = R.drawable.status_alert
+
+        Log.d("Result", "raiseGrade: ")
+        when (grade) {
+            MetricGrade.GOOD -> {}
+            MetricGrade.ALERT -> {
+                grade = MetricGrade.GOOD
+                gradeImage = R.drawable.status_good
+            }
+            MetricGrade.FAILED -> {
+                grade = MetricGrade.ALERT
+                gradeImage = R.drawable.status_alert
+            }
         }
-        else {
-            grade = MetricGrade.GOOD
-            gradeColor = "#228b22"
-            gradeImage = R.drawable.status_good
-        }
+
     }
-
-
-
-
-
 
 }
 
-enum class MetricGrade() {
+enum class MetricGrade {
     GOOD,
     ALERT,
     FAILED

@@ -193,7 +193,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         model?.getConnectedBand()?.observe(viewLifecycleOwner) { testRoomDialog.findViewById<TextView>(R.id.connectedBandLabel)?.text = "( $it )" }
         model?.getConnectedBssid()?.observe(viewLifecycleOwner) { testRoomDialog.findViewById<TextView>(R.id.bssidLabel)?.text = " ( $it )" }
 
-        binding.testNameLabel.setOnLongClickListener {
+        binding.sessionNameContainer.setOnLongClickListener {
             if (global_testingState) changeNameAlert.show()
             true
         }
@@ -224,6 +224,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             testRoomDialog.show()
             roomTestingProgressTimeComplete = false
             progressTimeHandler.postDelayed(progressTimeRunnable, 1000)
+            processNetworkData(wifiManager!!, telephonyManager)
             GlobalScope.launch(Dispatchers.IO) { speedTestSocket.startDownload("http://speedtest.tele2.net/10MB.zip") }
 
 
@@ -261,8 +262,10 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         }
         else {
             if (global_testName != "") {
-                binding.testNameLabel.text = "Last Session Name: $global_testName"
-                binding.testNameLabel.visibility = View.VISIBLE
+                binding.sessionNameDisplay.text = "Prev. Session Name:"
+                binding.sessionName.text = global_testName
+                binding.tapHoldLabel.visibility = View.INVISIBLE
+                binding.sessionNameContainer.visibility = View.VISIBLE
             }
         }
 
@@ -274,8 +277,8 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         binding.startTestingButton.visibility = View.GONE
         binding.testingSessionTimerContainer.visibility = View.VISIBLE
         binding.testingButtonContainer.visibility = View.VISIBLE
-        binding.testNameLabel.text = "Session Name: $global_testName\n(tap and hold to edit)"
-        binding.testNameLabel.visibility = View.VISIBLE
+        binding.sessionName.text = global_testName
+        binding.sessionNameContainer.visibility = View.VISIBLE
         binding.testingSessionTotalRoomsContainer.visibility = View.VISIBLE
     }
 
@@ -314,7 +317,9 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
         binding.startTestingButton.visibility = View.VISIBLE
         hideTestingMedia()
-        binding.testNameLabel.text = "Last Session Name: $global_testName"
+        binding.sessionNameDisplay.text = "Prev. Session Name:"
+        binding.sessionName.text = global_testName
+        binding.tapHoldLabel.visibility = View.INVISIBLE
         global_testingState = false
         metricsFrequencyHandler.removeCallbacks(metricsFrequencyRunnable)
         handler.removeCallbacks(runnable)
@@ -366,7 +371,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             }
 
             val ri = RoomInfo(  lteImage = global_testingCellModel.gradeImage, roomName=roomName,
-                                totalTimeSeconds = global_roomSeconds, lteImageColor = global_testingCellModel.gradeColor,
+                                totalTimeSeconds = global_roomSeconds,
                                 downloadSpeedResult = global_downloadResult, avgRsrq = global_testingCellModel.rsrqValueList.average().toInt(),
                                 avgRsrp = global_testingCellModel.rsrpValueList.average().toInt() )
 
@@ -400,7 +405,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
         return dialog
     }
-
 
     private fun getStartAlert(): AlertDialog {
 
@@ -480,18 +484,27 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         model?.addLinkRate(wm.connectionInfo.linkSpeed)
         model?.addConnectedBssid(wm.connectionInfo.bssid)
 
-        if (tm == null) return
-
+        if (tm == null) {
+            Log.d("Result", "processNetworkData: tm is null")
+            return
+        }
+        Log.d("Result", "processNetworkData: processing tm")
         tm.allCellInfo.forEach {
             when(it) {
                 is CellInfoLte -> {
+
 
                     if (!it.isRegistered) return@forEach
                     model?.addRsrp(it.cellSignalStrength.rsrp)
                     model?.addRsrq(it.cellSignalStrength.rsrq)
                     model?.addConnectedBand(Utility.getCellBand(it.cellIdentity.earfcn))
 
-                    global_testingCellModel.addMetrics(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, Utility.getCellBand(it.cellIdentity.earfcn))
+                    val lteData = lteObject(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, System.currentTimeMillis())
+                    global_cellTimeLine.add(lteData)
+
+                    if (testingRoomState) { global_testingCellModel.addMetrics(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, Utility.getCellBand(it.cellIdentity.earfcn)) }
+
+
 
                 }
             }
