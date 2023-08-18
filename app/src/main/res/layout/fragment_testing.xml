@@ -60,7 +60,7 @@
         android:id="@+id/testingSessionTotalRoomsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/testingButtonContainer"
         android:layout_marginBottom="10dp">

@@ -10,6 +10,9 @@ enum class RoomResult(val color: String) {
     ALERT("#f0e130")
 }
 
+//Application Globals
+var global_completedPortChecker: Boolean = false
+
 //TESTING ACTIVITY GLOBALS
 var global_testStartTimeEpoch: Long = 0
 var global_testEndTimeEpoch: Long = 0

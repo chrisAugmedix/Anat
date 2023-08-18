@@ -3,8 +3,8 @@ package com.nettest.anat.fragments.testing_fragment
 import com.nettest.anat.RoomResult
 
 data class RoomInfo(
-    val wifiImage: Int, val lteImage: Int, val roomName: String, val totalTimeSeconds: Int,             //RecyclerView Data
-    val wifiImageColor: String, val lteImageColor: String,                                              //RecyclerView Data
+    val lteImage: Int, val roomName: String, val totalTimeSeconds: Int,             //RecyclerView Data
+    val lteImageColor: String,                                                      //RecyclerView Data
     var downloadSpeedResult: Float = 0F, var avgRssi: Int = 0, var avgLink: Int = 0,
     var avgRsrp: Int = 0, val avgRsrq: Int = 0
 //                    var connectedAps: List<String>, var wifiRssiHistory: List<SignalStrengthWifi>

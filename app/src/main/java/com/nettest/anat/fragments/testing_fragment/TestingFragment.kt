@@ -74,7 +74,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private val metricsFrequencyRunnable = object : Runnable {
         override fun run() {
             if (global_testingState) {
-//                (model as TestingViewModel).addNetworkData(wifiManager, telephonyManager)
                 processNetworkData(wifiManager!!, telephonyManager)
                 handler.postDelayed(this, global_testingNetworkCadence)
             }
@@ -97,13 +96,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         }
     }
 
-
-
-    override fun onResume() {
-
-
-        super.onResume()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -176,11 +168,11 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
                 roomSessionProgressBar.progress = progressPercent
 
                 when (progressPercent) {
-                    in 0..15 ->  {  roomSessionProgressText?.text = "Grabbing metrics in room (${progressPercent}%)" }
-                    in 16..35 -> {  roomSessionProgressText?.text = "Please standby until completed (${progressPercent}%)" }
-                    in 36..50 -> {  roomSessionProgressText?.text = "Almost at the halfway mark... (${progressPercent}%)" }
-                    in 51..75 -> {  roomSessionProgressText?.text = "Just a few more seconds (${progressPercent}%)" }
-                    in 76..99 -> {  roomSessionProgressText?.text = "Finalizing our data (${progressPercent}%)" }
+                    in 0..12 ->  {  roomSessionProgressText?.text = "Grabbing metrics in room (${progressPercent}%)" }
+                    in 13..29 -> {  roomSessionProgressText?.text = "Please standby until completed (${progressPercent}%)" }
+                    in 30..45 -> {  roomSessionProgressText?.text = "Almost at the halfway mark... (${progressPercent}%)" }
+                    in 46..70 -> {  roomSessionProgressText?.text = "Just a few more seconds (${progressPercent}%)" }
+                    in 71..99 -> {  roomSessionProgressText?.text = "Finalizing our data (${progressPercent}%)" }
                     100 -> { roomSessionProgressText?.text = "Room Testing Complete" }
                 }
 
@@ -366,8 +358,8 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
                 roomName = "Room ${global_roomList.size+1}*"
             }
 
-            val ri = RoomInfo(  wifiImage = R.drawable.status_good, lteImage = global_testingCellModel.gradeImage, roomName=roomName,
-                                totalTimeSeconds = global_roomSeconds, wifiImageColor = "#228b22", lteImageColor = global_testingCellModel.gradeColor,
+            val ri = RoomInfo(  lteImage = global_testingCellModel.gradeImage, roomName=roomName,
+                                totalTimeSeconds = global_roomSeconds, lteImageColor = global_testingCellModel.gradeColor,
                                 downloadSpeedResult = global_downloadResult, avgRsrq = global_testingCellModel.rsrqValueList.average().toInt(),
                                 avgRsrp = global_testingCellModel.rsrpValueList.average().toInt() )
 
@@ -395,8 +387,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             buttonClose.setBackgroundColor(resources.getColor(R.color.extra_light_gray))
 
         }
-
-
 
         dialog.setCancelable(false)
         dialog.setContentView(view)
@@ -481,13 +471,9 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
                     global_testingCellModel.addMetrics(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, Utility.getCellBand(it.cellIdentity.earfcn))
 
-
                 }
             }
         }
-
-
-
     }
 
 }

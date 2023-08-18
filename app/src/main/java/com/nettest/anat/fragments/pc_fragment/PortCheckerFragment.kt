@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nettest.anat.R
 import com.nettest.anat.databinding.FragmentPortCheckerBinding
+import com.nettest.anat.global_completedPortChecker
 
 class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
 
@@ -51,6 +52,7 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
         binding.pcButtonRun.setOnClickListener {
 
             binding.pcButtonRun.showLoading()
+            global_completedPortChecker = true
 
         }
 

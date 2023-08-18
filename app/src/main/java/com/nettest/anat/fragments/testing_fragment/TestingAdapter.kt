@@ -28,10 +28,7 @@ class TestingAdapter(private val itemList: List<RoomInfo>, private val c: Contex
 
         val item = itemList[position]
         Log.d("Result", item.toString())
-        val wifiImageView = holder.wifiStatusView
         val lteImageView = holder.lteStatusView
-        wifiImageView.setImageResource(item.wifiImage)
-        wifiImageView.setColorFilter(Color.parseColor(item.wifiImageColor))
         lteImageView.setImageResource(item.lteImage)
         lteImageView.setColorFilter(Color.parseColor(item.lteImageColor))
         if (item.roomName.length > 10) { holder.roomName.textSize = 13F }
@@ -61,7 +58,6 @@ class TestingAdapter(private val itemList: List<RoomInfo>, private val c: Contex
     }
 
     class ViewHolder(ItemView: View): RecyclerView.ViewHolder(ItemView) {
-        val wifiStatusView: ImageView = ItemView.findViewById(R.id.wifiStatusImageView)
         val lteStatusView: ImageView = ItemView.findViewById(R.id.lteStatusImageView)
         val roomName: TextView = ItemView.findViewById(R.id.cardRoomName)
         val roomTime: TextView = ItemView.findViewById(R.id.roomTestingTime)
