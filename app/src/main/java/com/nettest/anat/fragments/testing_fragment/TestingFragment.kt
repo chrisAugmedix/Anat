@@ -112,6 +112,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val changeNameAlert = getStartAlert()
         val testRoomDialog = getRoomTestingDialog()
         val endTestingDialog = getEndAlert()
+        val portCheckDialog = getPortCheckAlert()
 
         wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager?
         telephonyManager = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
@@ -198,6 +199,12 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         }
 
         binding.startTestingButton.setOnClickListener {
+
+            if (!global_completedPortChecker) {
+                portCheckDialog.show()
+                return@setOnClickListener
+            }
+
             val startTime = System.currentTimeMillis()
             startDate = startTime
             global_testStartTimeEpoch = startTime
@@ -408,6 +415,21 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         builder.setPositiveButton("SUBMIT") { di, _ ->
             global_testName = input.text.toString()
             startTesting()
+            di.cancel()
+        }
+
+        return builder.create()
+    }
+
+    private fun getPortCheckAlert(): AlertDialog {
+
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Woops!")
+        builder.setMessage("Please run a port check before starting a test session")
+        builder.setIcon(R.drawable.status_alert)
+
+        builder.setPositiveButton("Got it") { di, _ ->
             di.cancel()
         }
 
