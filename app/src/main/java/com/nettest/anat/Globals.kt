@@ -15,9 +15,13 @@ enum class RoomResult(val color: String) {
 var global_completedPortChecker: Boolean = false
 
 //TESTING ACTIVITY GLOBALS
+//Session
 var global_testStartTimeEpoch: Long = 0
 var global_testEndTimeEpoch: Long = 0
 var global_testingState = false
+//Room
+var global_roomTestingState = false
+var global_roomProgressComplete = false
 
 var global_testName = ""
 var global_roomList: MutableList<RoomInfo> = mutableListOf()
@@ -35,6 +39,9 @@ var global_testingCellModel: TestingCellModel = TestingCellModel()
 var global_downloadResult: Float = 0F
 
 var global_cellTimeLine: MutableList<lteObject> = mutableListOf()
+
+var global_testingMetricsFrequency = 5
+var global_portCheckRequired: Boolean = false
 
 
 //Testing Activity - App Settings

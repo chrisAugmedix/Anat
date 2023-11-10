@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -17,12 +18,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var androidPermissions = arrayOf(
-        android.Manifest.permission.READ_PHONE_STATE,
-        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        android.Manifest.permission.WAKE_LOCK,
         android.Manifest.permission.ACCESS_FINE_LOCATION,
         android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-        android.Manifest.permission.MANAGE_EXTERNAL_STORAGE
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        android.Manifest.permission.ACCESS_WIFI_STATE,
+        android.Manifest.permission.INTERNET,
+        android.Manifest.permission.READ_PHONE_STATE,
+        android.Manifest.permission.FOREGROUND_SERVICE,
+        android.Manifest.permission.CHANGE_WIFI_STATE,
+        android.Manifest.permission.WAKE_LOCK,
+        android.Manifest.permission.RECEIVE_BOOT_COMPLETED,
+        android.Manifest.permission.POST_NOTIFICATIONS
     )
 
     override fun onStart() {
@@ -42,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
         )
 
+        ActivityCompat.requestPermissions(this, androidPermissions, 101)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         navView.setupWithNavController(navController)
 
