@@ -31,7 +31,7 @@
             android:layout_margin="5dp"
             android:layout_weight="10"
             android:contentDescription="roomStatus"
-            android:src="@drawable/status_good"
+            android:src="@drawable/room_grade_pass"
             android:tag="image_tag" />
 
         <LinearLayout

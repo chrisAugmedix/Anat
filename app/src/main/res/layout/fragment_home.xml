@@ -85,7 +85,7 @@
         <androidx.constraintlayout.utils.widget.ImageFilterView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/status_good"
+            app:srcCompat="@drawable/room_grade_pass"
             android:layout_weight="1"/>
 
     </LinearLayout>

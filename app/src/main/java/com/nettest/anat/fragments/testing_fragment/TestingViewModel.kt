@@ -7,11 +7,6 @@ import android.telephony.TelephonyManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nettest.anat.Utility
-import com.nettest.anat.global_linkRoomList
-import com.nettest.anat.global_rsrpRoomList
-import com.nettest.anat.global_rsrqRoomList
-import com.nettest.anat.global_rssiRoomList
-import com.nettest.anat.global_sessionSeconds
 
 class TestingViewModel: ViewModel() {
 
@@ -35,30 +30,6 @@ class TestingViewModel: ViewModel() {
 
     //11.7 -- END
 
-    //Junk
-    private var junk            = MutableLiveData<Int>(0)
-
-    //Session Variables
-    private var totalRooms      = MutableLiveData<Int>(0)
-    private var sessionSecs     = MutableLiveData<Int>(0)
-
-    //Room Variables
-    private var roomSeconds             = MutableLiveData<Int>(0)
-    private var downloadProgress        = MutableLiveData<Int>(0)
-    private var roomTestingProgressTime = MutableLiveData<Int>(0)
-
-    //WIFI
-    private var connectedBssid          = MutableLiveData<String>("N/A")
-    private var avgRssi                 = MutableLiveData<Int>(0)
-    private var avgLinkRate             = MutableLiveData<Int>(0)
-
-    //LTE
-    private var connectedBand   = MutableLiveData<Int>(0)
-    private var avgRsrp         = MutableLiveData<Int>(0)
-    private var avgRsrq         = MutableLiveData<Int>(0)
-
-    //Public Functions
-
     //11.7 -- new method
     fun addSessionData() {
 
@@ -74,25 +45,16 @@ class TestingViewModel: ViewModel() {
 
     }
 
-    fun addRoomData(wifi: WifiManager, lte: TelephonyManager, speedTestProgress: Int? = null, roomTestProgress: Int? = null) {
+    fun addRoomData() {
 
         val viewMap = roomMap.value!!
         sessionRoomSeconds++
 
         viewMap["sessionRoomTime"] = sessionRoomSeconds.toString()
 
-        val transportInfo = wifi.connectionInfo ?: null
-
-        val connectedChannel = if (transportInfo?.frequency == null) "N/A" else Utility.getWiFiAPChannel(transportInfo.frequency)
-        val rssi = transportInfo?.rssi ?: "N/A"
-        val rate = transportInfo?.linkSpeed ?: "N/A"
-
-        viewMap["wifiRssi"] = rssi.toString()
-        viewMap["wifiLinkRate"] = rate.toString()
-
     }
 
-    fun addDataRoom() {
+    fun addDataRoomCount() {
         val viewMap = sessionMap.value!!
         sessionTotalRooms++
         viewMap["sessionTotalRooms"] = sessionTotalRooms.toString()
@@ -129,12 +91,8 @@ class TestingViewModel: ViewModel() {
 
         roomMap.value = viewMap
 
-
     }
 
-    fun resetRoomNetworkData() {
-
-    }
     fun addRoomProgressSecond() {
         val viewMap = roomMap.value!!
         sessionProgressSeconds++
@@ -142,15 +100,19 @@ class TestingViewModel: ViewModel() {
         roomMap.value = viewMap
     }
 
-    fun resetProgressSeconds() {
+    fun resetRoomValues() {
+
         roomLteRsrqList.clear()
         roomLteRssiList.clear()
         roomLteRsrpList.clear()
         roomWifiLinkRateList.clear()
         roomWifiRssiList.clear()
+
         val viewMap = roomMap.value!!
         sessionProgressSeconds = 0
         viewMap["sessionRoomProgress"] = sessionProgressSeconds.toString()
+        viewMap["speedTestResult"] = "Running Download Test..."
+        viewMap["speedTestProgress"] = "0"
         roomMap.value = viewMap
     }
 

@@ -13,20 +13,22 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nettest.anat.R
+import com.nettest.anat.RoomData
 import com.nettest.anat.Utility
 
 @SuppressLint("SetTextI18n")
-class TestingAdapter(private val itemList: List<RoomInfo>, private val c: Context): RecyclerView.Adapter<TestingAdapter.ViewHolder>() {
+class TestingAdapter(private val itemList: List<RoomData>, private val c: Context): RecyclerView.Adapter<TestingAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TestingAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.testing_recycler_view_parent, parent, false)
         return ViewHolder(view)
     }
 
 
-    override fun onBindViewHolder(holder: TestingAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val item = itemList[position]
+        val roomData = itemList[position]
+        val metricData = roomData.metricDataList
         Log.d("Result", item.toString())
         val lteImageView = holder.lteStatusView
         lteImageView.setImageResource(item.lteImage)

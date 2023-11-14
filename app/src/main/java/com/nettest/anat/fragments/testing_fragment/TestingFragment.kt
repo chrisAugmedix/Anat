@@ -3,14 +3,12 @@ package com.nettest.anat.fragments.testing_fragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.hardware.display.DisplayManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.PowerManager
-import android.telephony.CellInfoLte
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,9 +19,12 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -41,12 +42,8 @@ import fr.bmartel.speedtest.model.SpeedTestError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -59,58 +56,19 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     private var _binding: FragmentTestingBinding? = null
     private val binding get() = _binding!!
 
-    private var testingRoomState = false
-    private var roomTestingProgressTimeComplete = false
 
+    private var inactivityEpochTime: Long? = null
+    private var roomTestingProgressTimeComplete = false
     private var endDate: Long? = null
     private var testingViewModel: TestingViewModel = TestingViewModel()
     private val df = DecimalFormat("#,###.00")
 
-    private var metricsCounter = 0
-    private val sessionTimeHandler = Handler(Looper.getMainLooper())
-    private val sessionTimeRunn = object: Runnable {
-        override fun run() {
-
-            //Every Second
-            addSecond()
-
-            //Need to add second to global from here, no other way based off my testing
-            global_sessionSeconds++
-
-            if (testingRoomState) global_roomSeconds++
-
-//            if (metricsCounter % global_testingMetricsFrequency == 0) { processNetworkData(wifiManager!!, telephonyManager) }
-            metricsCounter++
-
-            if (!global_testingState) sessionTimeHandler.removeCallbacks(this)
-            else sessionTimeHandler.postDelayed(this, 1000)
-        }
-    }
-
-    private var wifiManager: WifiManager? = null
-    private var telephonyManager: TelephonyManager? = null
-
-
-    private val progressTimeHandler = Handler()
-    private val progressTimeRunnable = object : Runnable {
-        override fun run() {
-            if (!roomTestingProgressTimeComplete) {
-                (testingViewModel as TestingViewModel).addSecondToRoomProgressTime()
-                progressTimeHandler.postDelayed(this, 1000)
-            }
-            else {
-                (testingViewModel as TestingViewModel).resetRoomTestingProgressTime()
-                progressTimeHandler.removeCallbacks(this)
-            }
-        }
-    }
-
-    private val inactivityTimeSeconds: Long = ( 60 * 10 * 1000L ) // ( Seconds )  * ( Minutes )  * ( millisecond conversion )
-
+    private val inactivityTimeSeconds: Long = ( 1 * 10 * 1000L ) // ( Seconds )  * ( Minutes )  * ( millisecond conversion )
+    private val inactivityMessageTimeOut: Long = 10000 // ( seconds ) * (ms to s conversion)
     private var lifecycleLoopRunning = false //To prevent multiple scopes running adding seconds
     private val speedTestSocket by lazy { SpeedTestSocket().apply { socketTimeout = 5000 } }
-    private val wifiManagerTemp by lazy { context?.getSystemService(Context.WIFI_SERVICE) as WifiManager }
-    private val telephonyManagerTemp by lazy { context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager }
+    private val wifiManager by lazy { context?.getSystemService(Context.WIFI_SERVICE) as WifiManager }
+    private val telephonyManager by lazy { context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager }
 
     override fun onResume() {
 
@@ -133,9 +91,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-        telephonyManager = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
-
         //Initial
         val setSessionNameDialog = getSessionNameAlertDialog()
         val testRoomDialog = getRoomTestingDialog()
@@ -143,24 +98,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val portCheckDialog = getPortCheckAlert()
         val sessionInactivityDialog = getInactivityDialog()
 
-        val tempRunn = Runnable {
-            if (sessionInactivityDialog.isShowing) {
-                sessionInactivityDialog.dismiss()
-                endSession()
-            }
-        }
-        val tempHandler = Handler()
-
-        //Start the Inactivity Timer when user starts session
-        val inactivityHandler = Handler()
-        val inactivityRunnable = Runnable {
-            if (global_testingState) {
-                requireActivity().runOnUiThread {
-                    sessionInactivityDialog.show()
-                    tempHandler.postDelayed(tempRunn, 5000)
-                }
-            }
-        }
 
         //RecyclerView
         val recyclerView = binding.testingRecyclerView
@@ -254,21 +191,47 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
                 portCheckDialog.show()
                 return@setOnClickListener
             }
-
+            var showingInactivityModal = false
             setSessionNameDialog.show()
             if (!lifecycleLoopRunning) {
+
                 lifecycleLoopRunning = true
                 viewLifecycleOwner.lifecycleScope.launch {
                     //if testing add second
                     while (true) {
 
+                        let {
+                            if (!global_testingState) return@let
+
+                        }
                         if (global_testingState) {
 
-                            testingViewModel.addSessionData()
+//                            keepScreenOn()
 
-                            if (global_roomTestingState) {
-                                testingViewModel.addRoomData(wifiManagerTemp, telephonyManagerTemp)
-                                if (!global_roomProgressComplete) testingViewModel.addRoomProgressSecond()
+                            if ( didInactivityExceedThreshold() ) {
+
+                                if (!showingInactivityModal) {
+                                    showingInactivityModal = true
+                                    CoroutineScope(Dispatchers.Main).launch {
+
+                                        sessionInactivityDialog.show()
+                                        delay(inactivityMessageTimeOut)
+                                        sessionInactivityDialog.dismiss()
+                                        if (!userInactivityInteracted) endSession()
+                                        showingInactivityModal = false
+                                        userInactivityInteracted = false
+
+                                    }
+                                }
+                            } else {
+
+                                testingViewModel.addSessionData()
+
+                                if (global_roomTestingState) {
+                                    testingViewModel.addRoomData()
+                                    global_roomSeconds++
+                                    if (!global_roomProgressComplete) testingViewModel.addRoomProgressSecond()
+                                }
                             }
 
                         }
@@ -279,8 +242,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
                 }
             }
 
-
-            inactivityHandler.postDelayed(inactivityRunnable, inactivityTimeSeconds)
         }
 
         binding.endTestingButton.setOnClickListener {
@@ -290,27 +251,19 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
         binding.addRoomButton.setOnClickListener {
 
-            //Delay Inactivity Timer
-            inactivityHandler.removeCallbacks(inactivityRunnable)
-            inactivityHandler.postDelayed(inactivityRunnable, inactivityTimeSeconds)
-
-            testingRoomState = true
-            testingViewModel.addRoomNetworkData(wifiManagerTemp, telephonyManagerTemp)
-            testingViewModel.addRoomCount()
+            testingViewModel.addDataRoomCount()
+            testingViewModel.addRoomNetworkData(wifiManager, telephonyManager)
             testRoomDialog.show()
             global_roomTestingState = true
             roomTestingProgressTimeComplete = false
-            progressTimeHandler.postDelayed(progressTimeRunnable, 1000)
-            processNetworkData(wifiManager!!, telephonyManager)
             CoroutineScope(Dispatchers.IO).launch { speedTestSocket.startDownload("http://speedtest.tele2.net/10MB.zip") }
             CoroutineScope(Dispatchers.Main).launch {
                 while(global_roomTestingState) {
-                    testingViewModel.addRoomNetworkData(wifiManagerTemp, telephonyManagerTemp)
+                    testingViewModel.addRoomNetworkData(wifiManager, telephonyManager)
                     delay(global_testingMetricsFrequency*1000L)
                     if (!global_roomTestingState) this.cancel("GC-Scope")
                 }
             }
-//            GlobalScope.launch(Dispatchers.IO) { speedTestSocket.startDownload("http://speedtest.tele2.net/10MB.zip") }
 
 
         }
@@ -319,18 +272,17 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
             override fun onCompletion(report: SpeedTestReport?) {
                 val speedMb = df.format(report?.transferRateBit?.div(BigDecimal(1000000)))
-                testingViewModel.addSessionRoomDownloadProgress(100)
-                testingViewModel.addSessionRoomDownloadResult("Result: $speedMb Mbps")
-                requireActivity().runOnUiThread {
 
-//
+                CoroutineScope(Dispatchers.Main).launch {
+                    testingViewModel.addSessionRoomDownloadProgress(100)
+                    testingViewModel.addSessionRoomDownloadResult("Result: $speedMb Mbps")
                 }
+
             }
 
             override fun onProgress(percent: Float, report: SpeedTestReport?) {
-                testingViewModel.addSessionRoomDownloadProgress(percent.toInt())
-                requireActivity().runOnUiThread {
-
+                CoroutineScope(Dispatchers.Main).launch {
+                    testingViewModel.addSessionRoomDownloadProgress(percent.toInt())
                 }
             }
 
@@ -345,6 +297,26 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         else if (global_testName != "") { showPrevSessionName() }
 
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun didInactivityExceedThreshold(): Boolean {
+        if (inactivityEpochTime == null) return false
+        return System.currentTimeMillis() > inactivityEpochTime!!
+    }
+    private fun setInactiveTimeoutEpoch(idleTime: Boolean = false) {
+        val currentTimeMillis = System.currentTimeMillis()
+        inactivityEpochTime = currentTimeMillis + ( if (idleTime) 20000 else inactivityTimeSeconds )
+    }
+
+    private fun keepScreenOn() {
+        val displayManager = context?.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager?
+        displayManager?.displays?.forEach {
+            if (it.state != Display.STATE_OFF) return@forEach
+            Log.d(TAG, "Screen is Off")
+
+//            val powerManager = context?.getSystemService(Context.POWER_SERVICE) as PowerManager?
+//            powerManager?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Anat: Wakeup")?.acquire(1000)
+        }
     }
 
     private fun showPrevSessionName() {
@@ -389,47 +361,113 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
     }
 
-    private fun startSessionTimer() {
-
-        sessionTimeHandler.post(sessionTimeRunn)
-
-    }
-
 
     private fun startNewSession() {
 
         global_testStartTimeEpoch = System.currentTimeMillis()
         global_testingState = true
-        testingViewModel.resetSessionSeconds()
 
         hideNavBar()
         showRoomButtons()
         showSessionName()
-        startSessionTimer()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        setInactiveTimeoutEpoch()
 
         global_roomList.clear()
-        testingViewModel.resetRoomCount()
         testingViewModel.resetTestSessionData()
 
     }
 
+    private fun showHistory() {
+
+        binding.titleLabel1.text = "Testing History"
+        binding.viewHistoryButton.text = "Hide History"
+        binding.titleDescription1.visibility = View.GONE
+        val spinner = getSpinnerObject()
+        val recyclerView = binding.testingRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, positionId: Long) {
+
+                val sessionName = parent?.getItemAtPosition(position).toString()
+                if ( sessionName ==  "No History Found" ) return
+                val roomDataList = global_sessionDataList.firstOrNull { it.sessionName == sessionName }?.roomDataList
+                roomDataList?.let {
+                    if (it.isEmpty()) return@let
+                    val adapter = TestingAdapter(roomDataList, requireContext())
+                    recyclerView.adapter = adapter
+                }
+
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                //Do Nothing
+            }
+
+        }
+
+        binding.historySpinner.visibility = View.VISIBLE
+
+    }
+
+
+
+    private fun hideHistory() {
+
+        binding.titleLabel1.text = "Network Testing"
+        binding.viewHistoryButton.text = "View History"
+        binding.titleDescription1.visibility = View.VISIBLE
+        binding.historySpinner.visibility = View.GONE
+
+    }
+
+    private fun getSpinnerObject(): Spinner {
+
+        val spinner: Spinner = binding.historySpinner
+        val connectedSsid = wifiManager.connectionInfo?.ssid
+        val items: Array<String> = if (global_sessionDataList.isEmpty() || ( connectedSsid == null || connectedSsid.contains("unknown")) ) arrayOf("No History Found")
+                    else global_sessionDataList.filter { data -> data.ssid == connectedSsid }.map { it.sessionName }.toTypedArray()
+
+        val adapter = object: ArrayAdapter<String>(requireContext(), R.layout.diagnostics_spinner_view, items) {
+
+            override fun isEnabled(position: Int): Boolean { return position !=0 }
+
+            override fun getDropDownView(
+                position: Int, convertView: View?, parent: ViewGroup
+            ): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                if (position == 0) view.setTextColor(Color.GRAY)
+                else view.setTextColor(Color.BLACK)
+                return view
+            }
+
+        }
+
+        adapter.setDropDownViewResource(R.layout.diagnostics_spinner_view)
+        spinner.adapter = adapter
+        return spinner
+
+    }
+
     private fun hideNavBar() {
-        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.nav_view)
+        val navBar: BottomNavigationView = activity?.findViewById(R.id.nav_view) ?: return
         navBar.clearAnimation()
         navBar.animate().translationY(navBar.height.toFloat()).duration = 500
 
-        val controller = requireActivity().window.insetsController
+        val controller = activity?.window?.insetsController
         controller?.hide(WindowInsets.Type.navigationBars())
         controller?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     private fun showNavBar() {
-        val navBar: BottomNavigationView = requireActivity().findViewById(R.id.nav_view)
+        val navBar: BottomNavigationView = activity?.findViewById(R.id.nav_view) ?: return
         navBar.clearAnimation()
         navBar.animate().translationY(0F).duration = 500
-        val controller = requireActivity().window.insetsController
-        controller?.show(WindowInsets.Type.navigationBars())
+        val controller = activity?.window?.insetsController ?: return
+        controller.show(WindowInsets.Type.navigationBars())
     }
 
     private fun resumeSession() {
@@ -437,8 +475,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         hideNavBar()
         showRoomButtons()
         showSessionName()
-        testingViewModel.setSessionSeconds(global_sessionSeconds)
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
 
     }
@@ -459,12 +496,12 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         binding.tapHoldLabel.visibility = View.INVISIBLE
 
         global_testingState = false
-        sessionTimeHandler.removeCallbacks(sessionTimeRunn)
         showNavBar()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
     }
 
+    private var userInactivityInteracted = false
     private fun getInactivityDialog(): AlertDialog {
 
         val builder = AlertDialog.Builder(requireContext())
@@ -472,13 +509,13 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         builder.setMessage("Testing will automatically end unless you hit \"Continue Testing\"")
 
         builder.setPositiveButton("Continue Testing") { di, _ ->
-
+            userInactivityInteracted = true
+            setInactiveTimeoutEpoch(idleTime = true)
             di.dismiss()
 
         }
 
         builder.setNegativeButton("End Testing") { di, _ ->
-
             endSession()
             di.dismiss()
 
@@ -496,10 +533,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val buttonClose = view.findViewById<Button>(R.id.closeButton)
         val userRoomNameInput = view.findViewById<EditText>(R.id.userSessionRoomNameEditText)
         val roomNameTitle = view.findViewById<TextView>(R.id.roomNameTitle)
-        val resultText = view.findViewById<TextView>(R.id.downloadSpeedDynamic)
-        val speedTestProgressBar: ProgressBar = view.findViewById(R.id.downloadProgressBar)
-        val testingProgressBar: ProgressBar = view.findViewById(R.id.testingRemainingProgressBar)
-        val testingProgressText: TextView = view.findViewById(R.id.testingRemainingText)
         var roomName = ""
 
         val fadeOut = AlphaAnimation(1f, 0f)
@@ -519,16 +552,14 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             false
         }
 
-        roomNameTitle.setOnClickListener {
-            userRoomNameInput.visibility = View.VISIBLE
-        }
+        roomNameTitle.setOnClickListener { userRoomNameInput.visibility = View.VISIBLE }
 
         buttonClose.setOnClickListener {
 
+            //Update Inactivity Time
+            setInactiveTimeoutEpoch()
 
-            if (userRoomNameInput.text.toString() == "") {
-                roomName = "Room ${global_roomList.size+1}*"
-            }
+            if (userRoomNameInput.text.toString() == "") { roomName = "Room ${global_roomList.size+1}*" }
 
             val ri = RoomInfo(  lteImage = global_testingCellModel.gradeImage, roomName=roomName,
                                 totalTimeSeconds = global_roomSeconds,
@@ -539,20 +570,14 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             global_roomSeconds = 0
             global_testingCellModel = TestingCellModel()
 
-            testingRoomState = false
             global_roomTestingState = false
             dialog.dismiss()
-
-            testingProgressBar.progress = 0
-            testingProgressText.text = "0/100"
-            speedTestProgressBar.progress = 0
-            resultText.text = "Running Test..."
 
             roomNameTitle.visibility = View.GONE
             userRoomNameInput.visibility = View.VISIBLE
             userRoomNameInput.text.clear()
 
-            testingViewModel.resetProgressSeconds()
+            testingViewModel.resetRoomValues()
             global_roomProgressComplete = false
             buttonClose.isEnabled = false
             buttonClose.setTextColor(Color.BLACK)
@@ -590,7 +615,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Port Check Required")
         builder.setMessage("Please run a port check before starting a test session")
-        builder.setIcon(R.drawable.status_alert)
+        builder.setIcon(R.drawable.room_grade_alert)
 
         builder.setPositiveButton("Got it") { di, _ ->
             di.cancel()
@@ -609,7 +634,7 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
             endDate = ed
             global_testEndTimeEpoch = ed
             endSession()
-            testingViewModel.resetSessionSeconds()
+            testingViewModel.resetTestSessionData()
             di.cancel()
         }
         builder.setNegativeButton("Cancel") { _, _ ->
@@ -620,12 +645,6 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
     }
 
-    private fun addSecond() {
-        Log.d("function", "addSecond: $global_sessionSeconds")
-        if (testingRoomState) { testingViewModel?.roomAddSecond() }
-        testingViewModel?.sessionAddSecond()
-
-    }
 
     private fun getPercentProgress(num: Int): Int {
 
@@ -635,35 +654,5 @@ class TestingFragment: Fragment(R.layout.fragment_testing)  {
 
     }
 
-    @SuppressLint("MissingPermission")
-    private fun processNetworkData(wm: WifiManager, tm: TelephonyManager?) {
-
-        testingViewModel?.addRssi(wm.connectionInfo.rssi)
-        testingViewModel?.addLinkRate(wm.connectionInfo.linkSpeed)
-        testingViewModel?.addConnectedBssid(wm.connectionInfo.bssid)
-
-        if (tm == null) {
-            Log.d("Result", "processNetworkData: tm is null")
-            return
-        }
-        Log.d("Result", "processNetworkData: processing tm")
-        tm.allCellInfo.forEach {
-            when(it) {
-                is CellInfoLte -> {
-
-                    if (!it.isRegistered) return@forEach
-                    testingViewModel?.addRsrp(it.cellSignalStrength.rsrp)
-                    testingViewModel?.addRsrq(it.cellSignalStrength.rsrq)
-                    testingViewModel?.addConnectedBand(Utility.getCellBand(it.cellIdentity.earfcn))
-
-                    val lteData = lteObject(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, System.currentTimeMillis())
-                    global_cellTimeLine.add(lteData)
-
-                    if (testingRoomState) { global_testingCellModel.addMetrics(it.cellSignalStrength.rsrp, it.cellSignalStrength.rsrq, Utility.getCellBand(it.cellIdentity.earfcn)) }
-
-                }
-            }
-        }
-    }
 
 }

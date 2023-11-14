@@ -1,16 +1,25 @@
 package com.nettest.anat
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.view.View
+import android.os.PowerManager
+import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nettest.anat.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private val TAG = "MainActivity"
 
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy {
@@ -42,11 +51,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         window.insetsController?.setSystemBarsAppearance(
             WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
             WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
         )
+
+        registerReceiver(LockButtonReceiver(), IntentFilter(Intent.ACTION_SCREEN_OFF))
 
         ActivityCompat.requestPermissions(this, androidPermissions, 101)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
@@ -54,4 +64,31 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+        Log.d(TAG, "onKeyDown: $keyCode")
+        if (!global_testingState) return super.onKeyDown(keyCode, event)
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+
+
+
+    
+}
+
+class LockButtonReceiver: BroadcastReceiver() {
+    override fun onReceive(p0: Context?, p1: Intent?) {
+        if (p1?.action.equals(Intent.ACTION_SCREEN_OFF)) {
+            if (global_testingState) {
+                val powerManager = p0?.getSystemService(Context.POWER_SERVICE) as PowerManager?
+                powerManager?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Anat: Wakeup")?.acquire(1000)
+            }
+        }
+    }
+
 }

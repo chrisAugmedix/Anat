@@ -11,7 +11,7 @@ class TestingCellModel {
     private val connectedBandList: MutableList<Int> = mutableListOf()
 
     var grade: MetricGrade = MetricGrade.GOOD
-    var gradeImage: Int = R.drawable.status_good
+    var gradeImage: Int = R.drawable.room_grade_pass
 
     fun addMetrics(rsrp: Int, rsrq: Int, band: Int) {
         rsrpValueList.add(rsrp)
@@ -25,7 +25,7 @@ class TestingCellModel {
         //Grade based on average values
         var subBand: Boolean = false
 
-        when(Utility.mostCommonInList(connectedBandList)) {
+        when( Utility.mostCommonInList(connectedBandList) ) {
             5, 13 -> { reduceGrade(autoFail = true) }
             2 -> { subBand = true }
             else -> { raiseGrade() }
@@ -40,18 +40,18 @@ class TestingCellModel {
         Log.d("Result", "reduceGrade: ")
         if (autoFail) {
             grade = MetricGrade.FAILED
-            gradeImage = R.drawable.status_failed
+            gradeImage = R.drawable.room_grade_fail
             return
         }
 
         when(grade) {
             MetricGrade.GOOD -> {
                 grade = MetricGrade.ALERT
-                gradeImage = R.drawable.status_alert
+                gradeImage = R.drawable.room_grade_alert
             }
             MetricGrade.ALERT -> {
                 grade = MetricGrade.FAILED
-                gradeImage = R.drawable.status_alert
+                gradeImage = R.drawable.room_grade_alert
             }
             MetricGrade.FAILED -> {}
         }
@@ -65,17 +65,42 @@ class TestingCellModel {
             MetricGrade.GOOD -> {}
             MetricGrade.ALERT -> {
                 grade = MetricGrade.GOOD
-                gradeImage = R.drawable.status_good
+                gradeImage = R.drawable.room_grade_pass
             }
             MetricGrade.FAILED -> {
                 grade = MetricGrade.ALERT
-                gradeImage = R.drawable.status_alert
+                gradeImage = R.drawable.room_grade_alert
             }
         }
 
     }
 
 }
+
+class RoomMetrics(type: MetricType) {
+
+    private val metricPairList = mutableListOf<MetricPair>()
+    private var metricType: MetricType
+    init { metricType = type }
+    fun addMetricPair(metricPair: MetricPair) {
+
+        metricPairList.add(metricPair)
+
+
+    }
+
+    private fun updateGrade(metricValue: Int, metricName: String) {
+
+    }
+
+}
+
+enum class MetricType(type: String) {
+    WIFI("WiFi"),
+    LTE("LTE")
+}
+
+data class MetricPair(var metricValue: Int, var timestamp: Long)
 
 enum class MetricGrade {
     GOOD,

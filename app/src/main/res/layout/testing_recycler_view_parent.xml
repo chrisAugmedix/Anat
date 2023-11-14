@@ -43,7 +43,7 @@
                     android:layout_height="32dp"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="roomStatus"
-                    android:src="@drawable/status_good"
+                    android:src="@drawable/room_grade_pass"
                     android:tag="image_tag" />
 
             </LinearLayout>

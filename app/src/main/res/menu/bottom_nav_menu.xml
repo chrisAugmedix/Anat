@@ -4,27 +4,27 @@
     <item
         android:id="@+id/navigation_testing"
         android:title="Testing"
-        android:icon="@drawable/testing_24"/>
+        android:icon="@drawable/navigation_network_testing"/>
 
     <item
         android:id="@+id/navigation_stats_viewer"
         android:title="Stats"
-        android:icon="@drawable/chart_svg"/>
+        android:icon="@drawable/navigation_stats"/>
 
     <item
         android:id="@+id/navigation_home"
         android:title="Home"
-        android:icon="@drawable/home_24"/>
+        android:icon="@drawable/navigation_home"/>
 
     <item
         android:id="@+id/navigation_port_checker"
         android:title="Port Checker"
-        android:icon="@drawable/ethernet_svg"/>
+        android:icon="@drawable/navigation_port_checker"/>
 
     <item
         android:id="@+id/navigation_diagnostics"
         android:title="Tools"
-        android:icon="@drawable/tools_svg"/>
+        android:icon="@drawable/navigation_tools"/>
 
 
 
