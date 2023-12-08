@@ -1,39 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="16dp"
-    android:paddingBottom="72dp">
+    android:paddingBottom="72dp"
+    tools:ignore="HardcodedText" >
+
+    <Spinner
+        android:id="@+id/sessionSelectionSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
         android:id="@+id/topMenuBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/sessionSelectionSpinner">
 
         <Button
             android:id="@+id/stats_wifiButton"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             android:textColor="@color/gray"
-            android:textSize="18sp"
+            android:textSize="16sp"
             style="?android:attr/borderlessButtonStyle"
             android:text="WIFI Stats"/>
 
         <Button
             android:id="@+id/stats_lteButton"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             android:textColor="@color/gray"
-            android:textSize="18sp"
+            android:textSize="16sp"
             style="?android:attr/borderlessButtonStyle"
             android:text="LTE Stats"/>
 

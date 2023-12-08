@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="24dp"
+    tools:ignore="HardcodedText"
+    android:orientation="vertical">
+
+
+    <EditText
+        android:id="@+id/physicianEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter A Physician's Name"
+        android:inputType="textCapWords"
+        android:autofillHints="name"
+        android:paddingTop="16dp"/>
+    <TextView
+        android:id="@+id/physicianEntryTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:textSize="11sp"
+        android:layout_marginStart="8dp"
+        android:text="Physician Name"/>
+
+
+
+    <EditText
+        android:id="@+id/clinicEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Department or Clinic Name"
+        android:inputType="textCapWords"
+        android:paddingTop="24dp"
+        android:autofillHints="name"
+        tools:ignore="HardcodedText" />
+    <TextView
+        android:id="@+id/clinicEntryTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:textSize="11sp"
+        android:layout_marginStart="8dp"
+        android:paddingBottom="8dp"
+        android:text="Clinic Name"/>
+
+</LinearLayout>

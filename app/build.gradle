@@ -9,10 +9,11 @@ android {
 
     defaultConfig {
         applicationId "com.nettest.anat"
-        minSdk 33
+        minSdk 31
         targetSdk 34
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -50,9 +51,13 @@ android {
 
 dependencies {
 
+
+    implementation 'com.patrykandpatrick.vico:views:1.13.0'
+    implementation 'com.patrykandpatrick.vico:core:1.13.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
     implementation 'com.github.koushikcse:LoadingButton:1.7'
     implementation 'fr.bmartel:jspeedtest:1.32.1'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
 
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')

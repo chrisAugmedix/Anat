@@ -39,5 +39,10 @@
     <color name="status_good">#228b22</color>
     <color name="status_alert">#f0e130</color>
     <color name="status_failed">#FE0000</color>
+
+<!--    line colors-->
+    <color name="line_orange">#fdd1a1</color>
+    <color name="line_blue">#aed9e0</color>
+    <color name="line_green">#b2d8b0</color>
 </resources>
 

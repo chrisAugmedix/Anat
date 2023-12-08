@@ -15,88 +15,80 @@
         app:cardBackgroundColor="@color/extra_light_gray"
         app:cardCornerRadius="8dp">
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingHorizontal="8dp"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="10"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="LTE"/>
-
-                <ImageView
-                    android:id="@+id/lteStatusImageView"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center_horizontal"
-                    android:contentDescription="roomStatus"
-                    android:src="@drawable/room_grade_pass"
-                    android:tag="image_tag" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/cardRoomName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_marginHorizontal="4dp"
+                android:layout_weight=".5"
+                android:text="Room Name"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textSize="18sp"/>
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="45"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
-
-
-                <TextView
-                    android:id="@+id/cardRoomNameTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp"
-                    android:text="Room Name"/>
-
-                <TextView
-                    android:id="@+id/cardRoomName"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Room Name"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight=".7"
+                        android:textStyle="bold"
+                        android:text="LTE"/>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:gravity="end"
-                android:layout_weight="20"
-                android:orientation="vertical">
+                    <ImageView
+                        android:id="@+id/lteStatusImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".3"
+                        android:layout_gravity="center|center_vertical"
+                        android:contentDescription="roomStatus"
+                        android:src="@drawable/room_grade_pass"
+                        android:tag="image_tag" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="Duration"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/roomTestingTime"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="0m 0s"/>
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|center_vertical"
+                        android:layout_weight=".7"
+                        android:textStyle="bold"
+                        android:text="WIFI"/>
+
+                    <ImageView
+                        android:id="@+id/wifiStatusImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".3"
+                        android:layout_gravity="center|center_vertical"
+                        android:contentDescription="roomStatus"
+                        android:src="@drawable/room_grade_pass"
+                        android:tag="image_tag" />
+
+                </LinearLayout>
 
             </LinearLayout>
 

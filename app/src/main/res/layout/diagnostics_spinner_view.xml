@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/text1"
     style="?android:attr/spinnerDropDownItemStyle"
-    android:singleLine="true"
+    android:singleLine="false"
     android:layout_width="match_parent"
     android:gravity="center"
     android:textSize="18sp"

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
-    android:layout_marginBottom="72dp"
+    android:layout_marginBottom="80dp"
     android:paddingTop="16dp"
     tools:ignore="HardcodedText"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -14,7 +14,7 @@
         android:id="@+id/titleLabel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -30,6 +30,7 @@
         app:layout_constraintBottom_toBottomOf="@id/titleLabel1"
         android:backgroundTint="@color/white"
         android:textColor="@color/gray"
+        style="?android:attr/borderlessButtonStyle"
         android:text="View History"/>
 
     <Spinner
@@ -38,6 +39,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:visibility="gone"
+        android:paddingTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/titleDescription1"
         android:spinnerMode="dropdown"/>
@@ -57,12 +59,12 @@
         android:id="@+id/sessionNameContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:paddingTop="4dp"
+        android:orientation="vertical"
+        android:paddingTop="8dp"
         android:paddingBottom="14dp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleDescription1"
-        android:orientation="vertical">
+        app:layout_constraintTop_toBottomOf="@id/titleDescription1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,20 +73,20 @@
 
             <TextView
                 android:id="@+id/sessionNameDisplay"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight=".6"
-                android:textSize="16sp"
-                android:text="Session Name: "/>
+                android:layout_weight=".2"
+                android:text="Session Name: "
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sessionName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight=".4"
+                android:layout_weight=".8"
+                android:text="Testing Session Name 1"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="Testing Session Name 1"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -92,9 +94,9 @@
             android:id="@+id/tapHoldLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="italic"
+            android:text="(tap &amp; hold to edit)"
             android:textSize="12sp"
-            android:text="(tap &amp; hold to edit)"/>
+            android:textStyle="italic" />
 
     </LinearLayout>
 
@@ -103,9 +105,75 @@
         android:id="@+id/testingRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/testingSessionTimerContainer"
         app:layout_constraintTop_toBottomOf="@id/sessionNameContainer"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintBottom_toTopOf="@+id/testingSummaryContainer"
+        />
+
+    <LinearLayout
+        android:id="@+id/testingSummaryContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Summary"
+                android:textColor="?colorPrimary"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@id/testingSessionTimerContainer"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Rooms: "
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/summaryTotalRooms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="N/A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Time: "
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/summaryTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="N/A" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/testingSessionTotalRoomsContainer"
@@ -164,15 +232,12 @@
         android:id="@+id/startTestingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Test"
+        android:layout_marginBottom="8dp"
+        android:text="Start Session"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="8dp"/>
-
-
-
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <LinearLayout
@@ -180,31 +245,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/addRoomButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Room"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="8dp"
             android:layout_weight="25"
             android:backgroundTint="@color/button_green"
-            android:layout_marginBottom="8dp"/>
+            android:text="Add Room"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/endTestingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="End Session"
-            android:layout_weight="1"
             android:layout_marginStart="20dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
             android:backgroundTint="@color/button_red"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="End Session"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="8dp"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
     </LinearLayout>
 

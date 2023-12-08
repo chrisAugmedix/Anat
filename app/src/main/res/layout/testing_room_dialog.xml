@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@id/roomNameTitle"
         app:layout_constraintStart_toStartOf="parent"
         android:hint="Enter Room Name or Number"
-        android:inputType="textCapSentences"
+        android:inputType="textCapWords"
         android:imeOptions="actionDone"
         android:autofillHints="" />
 
@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:max="100"
+            android:max="345"
             android:progress="1"
             android:indeterminate="false"/>
 
@@ -322,13 +322,12 @@
         android:id="@+id/closeButton"
         android:layout_width="320dp"
         android:layout_height="72dp"
-        android:text="Complete Room"
+        android:text="2 Tasks Required Before Completing"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userSessionRoomNameEditText"
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/extra_light_gray"
         android:textColor="@color/Black"
-        android:enabled="false"
         android:layout_marginTop="350dp"/>
 
     <TextView

@@ -14,7 +14,7 @@ class TestingViewModel: ViewModel() {
     private val sessionMap = MutableLiveData(mutableMapOf<String, String>())
     private var totalSeconds: Int = 0
     private var sessionTotalRooms: Int = 0
-
+    private var roomProgressTime = MutableLiveData(0)
 
     //11.7 -- new method -- ROOM VIEW
     private var sessionRoomSeconds: Int = 0
@@ -44,6 +44,11 @@ class TestingViewModel: ViewModel() {
         sessionMap.value = viewMap
 
     }
+
+    fun setRoomProgressTime(progress: Int) {
+        roomProgressTime.value = progress
+    }
+    fun getRoomProgressTime() = roomProgressTime
 
     fun addRoomData() {
 

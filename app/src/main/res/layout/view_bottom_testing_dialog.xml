@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="550dp"
     android:paddingStart="18dp"
     android:paddingEnd="18dp"
     android:paddingTop="18dp"
@@ -10,57 +10,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
-        android:id="@+id/testingRoomSessionContainer"
+        android:id="@+id/roomNameContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/roomNameTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test Room Session #: "
+            android:layout_weight=".2"
+            android:text="Test Room 1"
+            android:textColor="?colorPrimary"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-        <TextView
-            android:id="@+id/testingRoomSessionNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:layout_marginStart="8dp"/>
-
+            android:textSize="18sp"/>
 
     </LinearLayout>
-
-
-
-    <TextView
-        android:id="@+id/roomNameTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Room: (Enter Room Name)"
-        android:textSize="24sp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/testingRoomSessionContainer"/>
-
 
     <LinearLayout
         android:id="@+id/sessionTimerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/roomNameTitle">
+        app:layout_constraintTop_toBottomOf="@id/roomNameContainer">
 
         <TextView
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test Time: "
+            android:text="Test Duration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/userSessionRoomNameEditText"/>
 
@@ -74,13 +55,271 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/wifiTitleBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sessionTimerContainer">
+
+        <TextView
+            android:id="@+id/wifiTitleBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="WiFi Stats"
+            android:textSize="18sp"
+            android:textColor="?colorSecondary"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wifiStatsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wifiTitleBarContainer"
+        android:orientation="vertical">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="Signal Strength (RSSI) Average"/>
+
+
+            <TextView
+                android:id="@+id/rssiAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp"
+            android:background="@color/extra_light_gray">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="Link Rate Tx Average"/>
+
+            <TextView
+                android:id="@+id/linkRateTxAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="Link Rate Rx Average"/>
+
+            <TextView
+                android:id="@+id/linkRateRxAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp"
+            android:background="@color/extra_light_gray">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="Most Common AP Channel"/>
+
+            <TextView
+                android:id="@+id/commonApChannelLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lteTitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wifiStatsContainer">
+
+        <TextView
+            android:id="@+id/lteStatsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LTE Stats"
+            android:layout_weight="3"
+            android:textSize="18sp"
+            android:textColor="?colorSecondary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/wifiStatsContainer"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lteStatsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lteTitleContainer"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="RSRP Average"/>
+
+            <TextView
+                android:id="@+id/rsrpAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp"
+            android:background="@color/extra_light_gray">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="RSRQ Average"/>
+
+            <TextView
+                android:id="@+id/rsrqAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="RSSI Average"/>
+
+            <TextView
+                android:id="@+id/lteRssiAvgLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="2dp"
+            android:background="@color/extra_light_gray">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".4"
+                android:textStyle="italic"
+                android:text="Most Common Cell Band"/>
+
+            <TextView
+                android:id="@+id/commonCellBandLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:gravity="center"
+                android:text="N/A"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/closeButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Exit Window"
+        android:text="Exit"
+        android:layout_marginTop="74dp"
+        android:layout_marginBottom="75dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sessionTimerContainer"
-        android:layout_marginTop="100dp"/>
+        app:layout_constraintTop_toBottomOf="@id/lteStatsContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

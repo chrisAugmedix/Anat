@@ -16,6 +16,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nettest.anat.databinding.ActivityMainBinding
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
         )
 
+        testSessionData()
+
         registerReceiver(LockButtonReceiver(), IntentFilter(Intent.ACTION_SCREEN_OFF))
 
         ActivityCompat.requestPermissions(this, androidPermissions, 101)
@@ -73,10 +76,20 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onKeyDown(keyCode, event)
+
     }
 
+    override fun onResume() {
+        Log.d(TAG, "onResume: App is on screen")
+        super.onResume()
+    }
 
+    override fun onPause() {
 
+        Log.d(TAG, "onPause: App in background")
+        super.onPause()
+
+    }
 
     
 }

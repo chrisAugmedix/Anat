@@ -47,7 +47,7 @@ object Utility {
 
     fun mostCommonInList(list: MutableList<Int>): Int {
         val result = list.groupingBy { it }.eachCount().toList().sortedByDescending { it.second }.take(1).map { it.first }
-        return result[0]
+        return if (result.isEmpty()) 0 else result[0]
     }
 
     fun getWiFiAPChannel(channel: Int?): Int {
