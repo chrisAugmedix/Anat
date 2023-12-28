@@ -1,5 +1,7 @@
 package com.nettest.anat
 
+import com.google.gson.Gson
+
 object Utility {
 
     fun getTimeFormat(seconds: Int): Pair<Int, Int> {
@@ -114,6 +116,61 @@ object Utility {
             else -> return 0
 
         }
+
+    }
+
+
+    fun getGson(data: RoomData): String? {
+
+        val gsonMap = LinkedHashMap<String, Any>()
+        val dataList = mutableListOf<Any>()
+        gsonMap["rNm"] = data.getRoomName() ?: return null
+        gsonMap["sNm"] = data.getSessionName()
+        gsonMap["sId"] = data.getSessionId()
+        gsonMap["dlr"] = data.getSpeedTestResult()
+
+        data.getMetricData().forEach { metricData ->
+
+            val wifiMap = LinkedHashMap<String, Any>()
+            val lteMap = LinkedHashMap<String, Any>()
+            val dataMap = LinkedHashMap<String, Any>()
+            val wifi = metricData.wifiMetrics
+            val lte = metricData.cellMetrics
+            val conn = metricData.connectivityMetrics
+            val ts = metricData.timestamp
+
+//            wifiMap["ip"]       = wifi.ip
+//            wifiMap["ssid"]     = wifi.ssid
+//            wifiMap["bssid"]    = wifi.bssid
+//            wifiMap["channel"]  = wifi.channel
+//            wifiMap["rssi"]     = wifi.rssi
+//            wifiMap["lrg"]      = wifi.linkRateGeneral
+//            wifiMap["lrtx"]     = wifi.linkRateTx
+//            wifiMap["lrrx"]     = wifi.linkRateRx
+
+//            lte.rssi?.let   { lteMap["rssi"] = it }
+//            lte.rsrp?.let   { lteMap["rsrp"] = it }
+//            lte.rsrq?.let   { lteMap["rsrq"] = it }
+//            lte.band?.let   { lteMap["band"] = it }
+//            lte.earfcn?.let { lteMap["earfcn"] = it }
+//            lte.pci?.let    { lteMap["pci"] = it }
+
+            val pingList = mutableListOf<Any>()
+            data class PingTest (val target: String, val res: Boolean, val dur: Int )
+//            conn.pingResultList.forEach { pr -> pingList.add( PingTest(pr.destination, pr.result, pr.duration) ) }
+
+            dataMap["ts"] = ts
+            dataMap["wifi"] = wifiMap
+            dataMap["cell"] = lteMap
+            dataMap["conn"] = pingList
+
+            dataList.add(dataMap)
+
+        }
+
+        gsonMap["data"] = dataList
+
+        return Gson().toJson(gsonMap)
 
     }
 }

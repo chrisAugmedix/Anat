@@ -69,6 +69,7 @@
         android:layout_marginTop="16dp"
         android:imeOptions="actionDone"
         android:inputType="text"
+        android:textAlignment="center"
         android:hint="Enter Address/Hostname"/>
 
     <ScrollView
@@ -88,16 +89,19 @@
 
     </ScrollView>
 
-    <com.kusu.loadingbutton.LoadingButton
+    <Button
         android:id="@+id/diagnostics_toolsButton"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:lb_buttonColor="@color/light_midnight_blue"
-        android:textColor="@color/white"
+        app:lb_buttonColor="@color/light_gray"
+        android:textColor="@color/Black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:lb_isShadowEnable="false"
-        android:text="Run Check"/>
+        android:enabled="false"
+        android:visibility="invisible"
+        android:text="Select Option"
+        app:lb_isShadowEnable="false"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

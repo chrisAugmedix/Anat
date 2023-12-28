@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
         )
 
-        testSessionData()
 
         registerReceiver(LockButtonReceiver(), IntentFilter(Intent.ACTION_SCREEN_OFF))
 

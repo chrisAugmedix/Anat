@@ -232,18 +232,15 @@ class ChildWiFiStatsFragment: Fragment(R.layout.fragment_stats_child_wifi) {
             }
         }
 
-
-
-
     }
 
     private fun updateAllStats(sessionData: SessionData) {
         //All metrics except download, since download data is in room list
-        val sessionWifiMetricsPair = sessionData.metricDataList.map { Pair(it.wifiMetrics, it.timestamp) }
+        val sessionWifiMetricsPair = sessionData.metricDataList.filter { it.wifiMetrics != null }.map { Pair(it.wifiMetrics!!, it.timestamp) }
         sessionWifiMetrics.addAll(sessionWifiMetricsPair)
 
         //All download metrics
-        val downloadMetrics = sessionData.roomDataList.map { Pair( it.getSpeedTestResult().toDouble(), it.getEnd() ) }
+        val downloadMetrics = sessionData.roomList.map { Pair( it.getSpeedTestResult().toDouble(), it.getEnd() ) }
         sessionDownloadMetrics.addAll(downloadMetrics)
 
         rssiDataSet = getLineData(getEntryList(sessionWifiMetrics, WifiMetricName.RSSI), "RSSI", ContextCompat.getColor(requireContext(), R.color.line_blue), WifiMetricName.RSSI)

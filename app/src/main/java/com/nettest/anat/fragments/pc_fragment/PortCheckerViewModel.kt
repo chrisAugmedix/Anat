@@ -2,9 +2,7 @@ package com.nettest.anat.fragments.pc_fragment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nettest.anat.global_resultList
-import com.patrykandpatrick.vico.core.extension.setFieldValue
-import kotlin.math.abs
+
 
 class PortCheckerViewModel: ViewModel() {
 

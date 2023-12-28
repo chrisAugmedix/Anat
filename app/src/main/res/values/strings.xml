@@ -1,19 +1,22 @@
 <resources>
     <string name="app_name">Anat</string>
-    <string name="home_info"><b>Augmedix Network Assistance Tool</b>\n\nThis tool will assist in testing out the environment for both WIFI and LTE (Cellular)</string>
+    <string name="home_info"><b>Augmedix Network (Wi-Fi &amp; LTE) Testing Tool</b></string>
     <string name="home_testing_info">Go to <b>Testing</b> when ready to test the network in the facility</string>
     <string name="home_tools_info">Go to <b>Tools</b> to view additional network stats and access network tools</string>
     <string name="testing_description">Test your area by clicking <b>Start Session</b></string>
     <string name="testing_title">Network Testing</string>
     <string name="spinner_ping">Sends an ICMP packet to your destination address</string>
     <string name="spinner_traceroute">Tracks real-time pathway from source to destination.\n<i>Note: Max of 64 hops</i></string>
-    <string name="spinner_speedTest">Run a speed test, downloads on average 10 megabytes of data to determine download and upload speeds.</string>
+    <string name="spinner_speedTest">Run a speed test, downloads on average 10 megabytes of data to determine download speeds.</string>
     <string name="regex_session_id">\\((\\d+)\\)</string>
+    <string name="test_button_time_msg">Please wait until allotted time is complete…</string>
+    <string name="test_button_both_msg">2 Tasks remaining…</string>
+    <string name="test_button_speed_msg">Speed test required to complete…</string>
+    <string name="connect_to_wifi">Tap To Connect To A WIFI Network</string>
 
     <string-array name="network_commands">
         <item>Select command…</item>
         <item>Ping</item>
-        <item>Traceroute</item>
         <item>Speed Test</item>
     </string-array>
 

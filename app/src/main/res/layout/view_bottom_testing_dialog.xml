@@ -27,6 +27,14 @@
             android:textStyle="bold"
             android:textSize="18sp"/>
 
+        <ImageView
+            android:id="@+id/testingUploadStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".8"
+            android:src="@drawable/testing_upload_pending_state"
+            android:contentDescription="uploadState" />
+
     </LinearLayout>
 
     <LinearLayout

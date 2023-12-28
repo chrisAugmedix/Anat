@@ -57,13 +57,13 @@ class ChildLteStatsFragment: Fragment(R.layout.fragment_stats_child_lte) {
         viewModel.selectedSession.observe(viewLifecycleOwner) { session ->
 
             newSessionSelected()
-            val cellMetrics = session.metricDataList.filter { it.cellMetrics.rssi != null }.map { Pair( it.cellMetrics, it.timestamp ) }
+            val cellMetrics = session.metricDataList.filter { it.cellMetrics?.rssi != null }.map { Pair( it.cellMetrics!!, it.timestamp ) }
             sessionCellMetrics.addAll(cellMetrics)
 
-            val cellRssiAvg = session.metricDataList.map { it.cellMetrics.rssi?: return@observe }.toMutableList().average().toInt()
-            val cellRsrpAvg = session.metricDataList.map { it.cellMetrics.rsrp?: return@observe }.toMutableList().average().toInt()
-            val cellRsrqAvg = session.metricDataList.map { it.cellMetrics.rsrq?: return@observe }.toMutableList().average().toInt()
-            val cellBand = session.metricDataList.map { it.cellMetrics.band ?: return@observe }.toMutableList()
+            val cellRssiAvg = session.metricDataList.map { it.cellMetrics?.rssi?: return@observe }.toMutableList().average().toInt()
+            val cellRsrpAvg = session.metricDataList.map { it.cellMetrics?.rsrp?: return@observe }.toMutableList().average().toInt()
+            val cellRsrqAvg = session.metricDataList.map { it.cellMetrics?.rsrq?: return@observe }.toMutableList().average().toInt()
+            val cellBand = session.metricDataList.map { it.cellMetrics?.band ?: return@observe }.toMutableList()
             val band = Utility.mostCommonInList(cellBand)
 
             updateValueLists()
@@ -76,7 +76,6 @@ class ChildLteStatsFragment: Fragment(R.layout.fragment_stats_child_lte) {
             setAllCheckBoxes(true)
 
         }
-
         
         binding.rssiCheckbox.setOnCheckedChangeListener { _, isChecked ->
             if (sessionCellMetrics.isEmpty()) return@setOnCheckedChangeListener

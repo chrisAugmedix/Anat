@@ -10,6 +10,17 @@ import com.nettest.anat.Utility
 
 class TestingViewModel: ViewModel() {
 
+    //12.28 -- NEW
+    private var sessionSeconds      = MutableLiveData(0) //AKA Total Seconds
+    private var totalRooms          = MutableLiveData(0)
+    private var roomSeconds         = MutableLiveData(0)
+
+    // Room Progress Bar Info
+    private var roomProgressPercent = MutableLiveData(0)
+    private var roomProgressBar     = MutableLiveData(0)
+    private var roomProgressMessage = MutableLiveData("")
+
+
     //11.7 -- new method -- SESSION VIEW
     private val sessionMap = MutableLiveData(mutableMapOf<String, String>())
     private var totalSeconds: Int = 0
@@ -30,20 +41,27 @@ class TestingViewModel: ViewModel() {
 
     //11.7 -- END
 
-    //11.7 -- new method
-    fun addSessionData() {
-
-        val viewMap = sessionMap.value!!
-
-        totalSeconds++
-
-        //Session Info
-        viewMap["sessionTotalTime"] = totalSeconds.toString()
-        viewMap["sessionTotalRooms"] = sessionTotalRooms.toString()
-
-        sessionMap.value = viewMap
-
+    fun addSecondToSession() { sessionSeconds.value = sessionSeconds.value!! + 1 }
+    fun addRoomToSession() { totalRooms.value = totalRooms.value!! + 1 }
+    fun addSecondToRoom() { roomSeconds.value = roomSeconds.value!! + 1 }
+    fun setProgressBarPercent(percent: Int) {
+        roomProgressPercent.value = percent
+        when(percent) {
+            in 0..15 ->  {  roomProgressMessage.value = "Grabbing metrics in room... (${percent}%)" }
+            in 16..29 -> {  roomProgressMessage.value = "Please standby until completed... (${percent}%)" }
+            in 30..45 -> {  roomProgressMessage.value = "Almost at the halfway mark... (${percent}%)" }
+            in 46..70 -> {  roomProgressMessage.value = "Just a few more seconds... (${percent}%)" }
+            in 71..99 -> {  roomProgressMessage.value = "Finalizing data... (${percent}%)" }
+            in 100..Int.MAX_VALUE -> { roomProgressMessage.value = "Allotted Time Required Completed" }
+        }
     }
+    fun setProgressBar(progress: Int) { roomProgressBar.value = progress }
+
+    fun getSessionSeconds() = sessionSeconds
+    fun getSessionRoomsCount() = totalRooms
+    fun getRoomSeconds() = roomSeconds
+
+
 
     fun setRoomProgressTime(progress: Int) {
         roomProgressTime.value = progress

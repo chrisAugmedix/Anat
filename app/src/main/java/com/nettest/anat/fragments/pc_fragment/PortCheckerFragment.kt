@@ -7,20 +7,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nettest.anat.R
 import com.nettest.anat.databinding.FragmentPortCheckerBinding
-import com.nettest.anat.fragments.NetworkOperations
+import com.nettest.anat.NetworkOperations
 import com.nettest.anat.global_completedPortChecker
+import com.nettest.anat.global_continuePortCheckFlag
 import com.nettest.anat.global_isPortCheckerRunning
 import com.nettest.anat.global_resultList
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +29,7 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
     private var _binding: FragmentPortCheckerBinding? = null
     private val binding get() = _binding!!
     private val recyclerViewResultItems: MutableList<EndpointParent> = mutableListOf()
+    private val endpointListSize = endpointList.size
 
     private var portCheckerViewModel: PortCheckerViewModel = PortCheckerViewModel()
     private val portCheckRecyclerView by lazy { binding.pcRecyclerView }
@@ -43,7 +41,6 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
         _binding = FragmentPortCheckerBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -63,44 +60,52 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
         portCheckRecyclerView.layoutManager = LinearLayoutManager(context)
         portCheckRecyclerView.adapter = portCheckRecyclerViewAdapter
 
-        binding.titleInfoButton.setOnClickListener {
-            getInfoDialog().show()
-        }
+        binding.titleInfoButton.setOnClickListener { getInfoDialog().show() }
 
-        binding.pcButtonAll.setOnClickListener {
-            buttonSelection(ButtonOption.ALL)
-        }
+        binding.pcButtonAll.setOnClickListener { buttonSelection(ButtonOption.ALL) }
 
-        binding.pcButtonFailed.setOnClickListener {
-            buttonSelection(ButtonOption.FAILED)
-        }
+        binding.pcButtonFailed.setOnClickListener { buttonSelection(ButtonOption.FAILED) }
 
-        binding.pcButtonSuccess.setOnClickListener {
-            buttonSelection(ButtonOption.PASSED)
-        }
+        binding.pcButtonSuccess.setOnClickListener { buttonSelection(ButtonOption.PASSED) }
+
+        var endpoints: MutableList<EndpointParent> = endpointList.toMutableList()
+//        if (global_resultList.isNotEmpty() && global_resultList.size < endpointListSize) {
+//            if (!global_continuePortCheckFlag) return
+//            binding.pcButtonRun.text = "Continue Port Check"
+//            endpoints = endpointList.subList(global_resultList.size, endpointListSize).toMutableList()
+//        } else {
+//            endpoints = endpointList.toMutableList()
+//        }
 
         binding.pcButtonRun.setOnClickListener {
 
-            clearRvList()
-//            hideBottomNavBar()
+
             setButtonStatus(false)
+
+            clearRvList()
             clearAllLists()
+            global_completedPortChecker = false
+            resetEndpointStats()
+
             deselectButton(binding.pcButtonFailed)
             deselectButton(binding.pcButtonSuccess)
 
             binding.pcButtonRun.showLoading()
-            resetEndpointStats()
             binding.pcButtonRun.isClickable = false
             highlightButton(binding.pcButtonAll)
             global_isPortCheckerRunning = true
             CoroutineScope(Dispatchers.Default).launch {
 
-                endpointList.forEach {
-                    Log.d("EndpointLoop", "onViewCreated: $it")
+                endpoints.forEach {
+
                     val endpointParent = when(it.requestType) {
                         RequestType.PING -> { processPing(it) }
                         RequestType.GET -> { processGet(it) }
                     }
+
+                    if (!this@PortCheckerFragment.isVisible) { return@launch }
+
+                    Log.d("PCFragment", "onViewCreated: Adding endpoint parent ${endpointParent.endpointName}")
                     global_resultList.add(endpointParent)
                     activity?.runOnUiThread {
                         portCheckerViewModel.addLastEndpointParent(endpointParent)
@@ -108,6 +113,7 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
                     }
 
                 }
+
 
                 CoroutineScope(Dispatchers.Main).launch {
                     setButtonStatus(true)
@@ -117,9 +123,10 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
                     global_isPortCheckerRunning = false
                     showNavBar()
                 }
-            }
-            global_completedPortChecker = true
 
+                endpoints = endpointList.toMutableList()
+                global_completedPortChecker = true
+            }
         }
 
         loadList()
@@ -137,6 +144,11 @@ class PortCheckerFragment: Fragment(R.layout.fragment_port_checker) {
         }
     }
 
+    private fun removeLastItemRv() {
+        if (recyclerViewResultItems.isEmpty() ) return
+        recyclerViewResultItems.removeLast()
+//        portCheckRecyclerViewAdapter.notifyItemRangeRemoved(0, size)
+    }
     private fun showNavBar() {
         val navBar: BottomNavigationView = activity?.findViewById(R.id.nav_view) ?: return
         navBar.clearAnimation()

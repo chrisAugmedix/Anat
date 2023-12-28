@@ -1,26 +1,26 @@
 package com.nettest.anat
 
-
-import android.util.Log
 import com.nettest.anat.fragments.pc_fragment.EndpointParent
 import com.nettest.anat.fragments.pc_fragment.PingResult
 import java.math.BigDecimal
 import kotlin.random.Random
 
-enum class RoomResult(val color: String) {
-    GOOD("#228b22"),
-    ALERT("#f0e130")
+enum class ConnectionInterface {
+    CELLULAR, WIFI, OFFLINE, ETHERNET
 }
-
 //Application Globals
 var global_completedPortChecker: Boolean = false
 var global_isPortCheckerRunning: Boolean = false
+
+//Home Fragment Global
+var global_snackBarDismissed: Boolean = false
+var home_lteDialogShown: Boolean = false
 
 //TESTING ACTIVITY GLOBALS
 var global_testingState = false //For BroadcastReceiver Activity -- required to ensure the back button is disabled & screen auto-turns on when lock button is pressed.
 
 //Changeable in app settings
-var global_testingRoomTimeLimit: Int = 45
+var global_testingRoomTimeLimit: Int = 15
 var global_testingMetricsFrequency = 5
 var global_portCheckRequired: Boolean = false
 
@@ -29,21 +29,19 @@ fun generateRandomId(): Int = Random.nextInt(1000, 100000)
 //PORT CHECKER GLOBALS
 var global_resultList = mutableListOf<EndpointParent>()
 val global_sessionDataList = mutableListOf<SessionData>()
-
+var global_continuePortCheckFlag: Boolean = false
 
 val poorWifiChannels = arrayOf(1, 6, 11, 36, 40, 44, 48, 149, 153, 157, 161, 165)
-
 var pingHostnameList = mutableListOf( "www.google.com", "mcu6.augmedix.com" )
 
-data class SessionData  (var sessionName: String = "", var roomDataList: MutableList<RoomData> = mutableListOf(),
-                         var metricDataList: MutableList<MetricData> = mutableListOf(), var ssid: String? = null,
-                         var sessionId: Int = generateRandomId(),
-                         var startEpoch: Long = System.currentTimeMillis(), var endEpoch: Long = System.currentTimeMillis())
-data class MetricData   ( val wifiMetrics: WifiMetrics, val cellMetrics: CellMetrics, val connectivityMetrics: ConnectivityMetrics, val timestamp: Long )
-data class WifiMetrics  (val ip: String, val rssi: Int, val linkRateGeneral: Int, val bssid: String, val channel: Int, val neighborList: MutableList<NeighborData>?,
+data class SessionData  (val sessionName: String, val sessionId: Int = generateRandomId(),
+                         val roomList: MutableList<RoomData> = mutableListOf(), var metricDataList: MutableList<MetricData> = mutableListOf())
+data class MetricData   ( var wifiMetrics: WifiMetrics? = null, var cellMetrics: CellMetrics? = null,
+                          var connectivityMetrics: ConnectivityMetrics? = null, val timestamp: Long )
+data class WifiMetrics  (val ip: String, val ssid: String, val bssid: String,
+                         val rssi: Int, val linkRateGeneral: Int, val channel: Int,
                          val band: Double, val linkRateTx: Int, val linkRateRx: Int )
-data class NeighborData ( val rssi: Int, val bssid: String, val channel: Int )
-data class CellMetrics  (var rssi: Int? = null, var rsrp: Int? = null, var rsrq: Int? = null, var band: Int? = null, var earfcn: Int? = null, var pci: Int? = null )
+data class CellMetrics  (var rssi: Int, var rsrp: Int, var rsrq: Int, var band: Int, var earfcn: Int, var pci: Int )
 data class ConnectivityMetrics ( val pingResultList: MutableList<PingResult> )
 
 
@@ -77,13 +75,14 @@ class RoomGrade {
     fun setUnknownGrade() { image = R.drawable.room_grade_unknown }
 
 }
-class RoomData {
+class RoomData( private var sessionName: String, private val sessionId: Int ) {
 
     private val roomId: Int = generateRandomId()
     private var roomName: String? = null
     private val metricDataList: MutableList<MetricData> = mutableListOf()
     private var cellGrade: RoomGrade = RoomGrade()
     private var wifiGrade: RoomGrade = RoomGrade()
+    private var uploadStatus: Boolean = false
     private var dlSpeedTestResult: BigDecimal? = null
     private var totalSeconds: Int = 0
     private var start: Long = 0
@@ -93,12 +92,14 @@ class RoomData {
         return if (other is RoomData) other.roomId == this.roomId
         else false
     }
+    fun getSessionName() = sessionName
+    fun getSessionId() = sessionId
 
     fun addMetrics(metrics: MetricData) { metricDataList.add(metrics) }
     fun updateRoomName(name: String) { roomName = name }
     fun finalizeRoom() { updateGrade() }
     fun setSpeedTestResult(result: BigDecimal?) { dlSpeedTestResult = result }
-
+    fun setUploadStatus(status: Boolean) { uploadStatus = status }
     fun updateStartTime() { start = System.currentTimeMillis() }
     fun updateEndTime() { end = System.currentTimeMillis() }
     fun addSecond() { totalSeconds++ }
@@ -115,22 +116,21 @@ class RoomData {
     private fun updateGrade() {
 
 
-        val cellbandList    = metricDataList.map { it.cellMetrics }.mapNotNull { it.band }.toMutableList()
-        val wifiBandList    = metricDataList.map { it.wifiMetrics }.map { it.band }.toMutableList()
-
         //LTE
         let {
 
-            if ( cellbandList.size < 5 ) {
+            val cellData = metricDataList.mapNotNull { it.cellMetrics }
+
+            if ( cellData.size < 5 ) {
                 cellGrade.setUnknownGrade()
                 return@let
             }
 
-            val rsrpList        = metricDataList.map { it.cellMetrics }.mapNotNull { it.rsrp }.toMutableList()
-            val cellRssiList    = metricDataList.map { it.cellMetrics }.mapNotNull { it.rssi }.toMutableList()
-            val rsrqList        = metricDataList.map { it.cellMetrics }.mapNotNull { it.rsrq }.toMutableList()
+            val rsrpList        = cellData.map { it.rsrp }.toMutableList()
+            val cellRssiList    = cellData.map { it.rssi }.toMutableList()
+            val rsrqList        = cellData.map { it.rsrq }.toMutableList()
 
-            when ( Utility.mostCommonInList(cellbandList) ) {
+            when ( Utility.mostCommonInList( cellData.map { it.band }.toMutableList() ) ) {
                 66, 4 -> { cellGrade.raiseGrade() }
                 5, 13 -> { cellGrade.lowerGrade() }
             }
@@ -158,61 +158,41 @@ class RoomData {
         //Wifi
         let {
 
-            if ( wifiBandList.size < 5 ) {
+            val wifiMetrics    = metricDataList.mapNotNull { it.wifiMetrics }
+
+            if ( wifiMetrics.size < 5 ) {
                 wifiGrade.setUnknownGrade()
                 return@let
             }
 
-            val rssiList     = metricDataList.map { it.wifiMetrics }.mapNotNull { it.rssi }.toMutableList()
-            val linkRateList = metricDataList.map { it.wifiMetrics }.mapNotNull { it.linkRateGeneral }.toMutableList()
-
-            var bandHopped: Boolean = false
-            wifiBandList.forEach { if (it != wifiBandList.first()) bandHopped = true }
-            val channelList = metricDataList.map { it.wifiMetrics }.mapNotNull { it.channel }.toMutableList()
-            if ( ( channelList.filter { it in poorWifiChannels } ).isNotEmpty() ) wifiGrade.lowerGrade()
-
-            if (!bandHopped) {
-
-                if ( wifiBandList.first() == 5.0 ) wifiGrade.raiseGrade()
-                val goodRssiRange = if ( wifiBandList.first() == 5.0 ) 0 downTo -65 else 0 downTo -59
-                val neutralRssiRange = if ( wifiBandList.first() == 5.0 ) -65 downTo -70 else -60 downTo -67
-                when (rssiList.average().toInt()) {
-                    in goodRssiRange -> { wifiGrade.raiseGrade() }
-                    in neutralRssiRange -> {}
-                    else -> { wifiGrade.lowerGrade() }
-                }
-
-                val goodLinkRateRange = if ( wifiBandList.first() == 5.0 ) 5000 downTo 100 else 5000 downTo 30
-                val neutralLinkRateRange = if ( wifiBandList.first() == 5.0 ) 99 downTo 50 else 29 downTo 15
-                when (linkRateList.average().toInt()) {
-                    in goodLinkRateRange -> { wifiGrade.raiseGrade() }
-                    in neutralLinkRateRange -> {}
-                    else -> { wifiGrade.lowerGrade() }
-                }
+            val rssiList     = wifiMetrics.map { it.rssi }.toMutableList()
+            val linkRateList = wifiMetrics.map { it.linkRateGeneral }.toMutableList()
 
 
-            } else {
+            val bandList = wifiMetrics.map { it.band }
+            val hopped = ( !bandList.all { it == bandList.first() } )
+            if ( !bandList.all { it == bandList.first() } ) wifiGrade.lowerGrade()
+            if ( wifiMetrics.map { it.channel }.any { it in poorWifiChannels } ) wifiGrade.lowerGrade()
 
-                val goodRange = 0 downTo -59
-                val neutralRange = -60 downTo -67
-                when (rssiList.average().toInt()) {
-                    in goodRange -> { wifiGrade.raiseGrade() }
-                    in neutralRange -> {}
-                    else -> { wifiGrade.lowerGrade() }
-                }
+            var goodRssiRange = 0 downTo -59
+            var neutralRssiRange = -60 downTo -65
+            var goodRateRange = 5000 downTo 30
+            var neutralLinkRateRange = 30 downTo 15
 
-                val goodLinkRateRange = 5000 downTo 100
-                val neutralLinkRateRange = 99 downTo 50
-                when (linkRateList.average().toInt()) {
-                    in goodLinkRateRange -> { wifiGrade.raiseGrade() }
-                    in neutralLinkRateRange -> {}
-                    else -> { wifiGrade.lowerGrade() }
-                }
+            let noHop@{
+                if ( hopped ) return@noHop
+                if ( bandList.first() == 2.4 ) return@noHop
+                goodRssiRange = 0 downTo -65
+                neutralRssiRange = -65 downTo -70
+                goodRateRange = 5000 downTo 100
+                neutralLinkRateRange = 99 downTo 50
             }
 
+            if ( rssiList.average().toInt() in goodRssiRange ) wifiGrade.raiseGrade()
+            else if ( ! neutralRssiRange.contains(rssiList.average().toInt()) ) wifiGrade.lowerGrade()
 
-
-
+            if ( linkRateList.average().toInt() in goodRateRange ) wifiGrade.raiseGrade()
+            else if ( ! neutralLinkRateRange.contains(linkRateList.average().toInt()) ) wifiGrade.lowerGrade()
 
         }
 
@@ -228,40 +208,4 @@ class RoomData {
         return result
     }
 
-}
-
-fun testSessionData() {
-    val sessionData = SessionData()
-    sessionData.sessionName = "TestSessionName"
-    sessionData.metricDataList = getJunkMetricData()
-    global_sessionDataList.add(sessionData)
-    val sessionDataTwo = SessionData()
-    sessionDataTwo.sessionName = "Really Long Testing Session Name For Testing Purposes"
-    sessionDataTwo.metricDataList = getJunkMetricData()
-    global_sessionDataList.add(sessionDataTwo)
-}
-
-private fun getJunkWifiMetrics(): WifiMetrics {
-    return WifiMetrics("junk", Random.nextInt(1, 100), Random.nextInt(1, 100), "junk", Random.nextInt(1, 100), null, Random.nextDouble(1.0, 100.0), Random.nextInt(1, 100), Random.nextInt(1, 100))
-}
-
-private fun getJunkConnectivityMetrics() :ConnectivityMetrics {
-    return ConnectivityMetrics(mutableListOf())
-}
-
-private fun getRandomCellMetrics(): CellMetrics {
-    return CellMetrics(Random.nextInt(1, 100), Random.nextInt(1, 100), Random.nextInt(1, 100), Random.nextInt(1, 100), Random.nextInt(1, 100), Random.nextInt(1, 100))
-}
-
-private fun getJunkMetricData(): MutableList<MetricData> {
-    val currentTime = System.currentTimeMillis()
-//    val currentTime = 0L
-    val dataList = mutableListOf<MetricData>()
-    for (x in 1..30) {
-        val timestamp: Long = currentTime + x*60*1000//(1000*x)
-        val cm = getRandomCellMetrics()
-        Log.d("TestingXAxis", "value: ${cm.rssi}\tts: $timestamp")
-        dataList.add(MetricData(getJunkWifiMetrics(), cm, getJunkConnectivityMetrics(), timestamp))
-    }
-    return dataList
 }

@@ -15,11 +15,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nettest.anat.R
 import com.nettest.anat.RoomData
 import com.nettest.anat.Utility
-import com.patrykandpatrick.vico.core.axis.AxisPosition
 
 @SuppressLint("SetTextI18n")
 class TestingAdapter( private val itemList: MutableList<RoomData>, private val context: Context ): RecyclerView.Adapter<ViewHolder>() {
 
+    override fun setHasStableIds(hasStableIds: Boolean) {
+        super.setHasStableIds(true)
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.testing_recycler_view_parent, parent, false)
         return ViewHolder(view)
@@ -35,6 +37,7 @@ class TestingAdapter( private val itemList: MutableList<RoomData>, private val c
         val roomData = itemList[position]
         val cellGrade = roomData.getCellGrade().getGrade()
         holder.lteStatusView.setImageResource(cellGrade)
+        holder.wifiStatusView.setImageResource(roomData.getWifiGrade().getGrade())
         holder.roomName.textSize = if ( roomData.getRoomName()!!.length > 10 ) 13F else 18F
         holder.roomName.text = roomData.getRoomName()
 
@@ -57,15 +60,15 @@ class TestingAdapter( private val itemList: MutableList<RoomData>, private val c
     private fun getRoomDialog(context: Context, data: RoomData):BottomSheetDialog {
 
         //Data portion
-        val rssiAvg = data.getMetricData().map { it.wifiMetrics }.map { it.rssi }.average().toInt()
-        val linkRateRxAvg = data.getMetricData().map { it.wifiMetrics }.map { it.linkRateRx }.average().toInt()
-        val linkRateTxAvg = data.getMetricData().map { it.wifiMetrics }.map { it.linkRateTx }.average().toInt()
-        val commonChannel = Utility.mostCommonInList( data.getMetricData().map { it.wifiMetrics }.map { it.channel }.toMutableList() )
+        val rssiAvg = data.getMetricData().mapNotNull { it.wifiMetrics }.map { it.rssi }.average().toInt()
+        val linkRateRxAvg = data.getMetricData().mapNotNull { it.wifiMetrics }.map { it.linkRateRx }.average().toInt()
+        val linkRateTxAvg = data.getMetricData().mapNotNull { it.wifiMetrics }.map { it.linkRateTx }.average().toInt()
+        val commonChannel = Utility.mostCommonInList( data.getMetricData().mapNotNull { it.wifiMetrics }.map { it.channel }.toMutableList() )
 
-        val rsrpAvg = data.getMetricData().map { it.cellMetrics }.mapNotNull { it.rsrp }.average().toInt()
-        val rsrqAvg = data.getMetricData().map { it.cellMetrics }.mapNotNull { it.rsrq }.average().toInt()
-        val lteRssiAvg = data.getMetricData().map { it.cellMetrics }.mapNotNull { it.rssi }.average().toInt()
-        val commonBand = Utility.mostCommonInList( data.getMetricData().map { it.cellMetrics }.mapNotNull { it.band }.toMutableList() )
+        val rsrpAvg = data.getMetricData().mapNotNull { it.cellMetrics }.map { it.rsrp }.average().toInt()
+        val rsrqAvg = data.getMetricData().mapNotNull { it.cellMetrics }.map { it.rsrq }.average().toInt()
+        val lteRssiAvg = data.getMetricData().mapNotNull { it.cellMetrics }.map { it.rssi }.average().toInt()
+        val commonBand = Utility.mostCommonInList( data.getMetricData().mapNotNull { it.cellMetrics }.map { it.band }.toMutableList() )
 
         val time = Utility.getTimeFormat(data.getRoomSeconds())
 
@@ -97,8 +100,8 @@ class TestingAdapter( private val itemList: MutableList<RoomData>, private val c
 
 class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
-
     val lteStatusView: ImageView = itemView.findViewById(R.id.lteStatusImageView)
+    val wifiStatusView: ImageView = itemView.findViewById(R.id.wifiStatusImageView)
     val roomName: TextView = itemView.findViewById(R.id.cardRoomName)
     val layout: CardView = itemView.findViewById(R.id.testingCardView)
 

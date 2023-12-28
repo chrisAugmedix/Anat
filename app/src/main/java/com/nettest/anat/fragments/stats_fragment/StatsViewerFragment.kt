@@ -77,7 +77,7 @@ class StatsViewerFragment: Fragment(R.layout.fragment_stats_viewer) {
             }
         }
 
-        loadLastSession(spinner)
+//        loadLastSession(spinner)
 
         super.onViewCreated(view, savedInstanceState)
     }
